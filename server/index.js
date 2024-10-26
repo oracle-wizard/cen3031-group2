@@ -22,6 +22,17 @@ app.use(
 
 const PORT = 4000
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`)
 })
+
+const shutdown = () => {
+    console.log('Shutting down server...')
+    server.close(() => {
+        console.log('Server closed')
+        process.exit(0)
+    })
+}
+
+process.on('SIGINT', shutdown)
+process.on('SIGTERM', shutdown)

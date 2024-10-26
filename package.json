@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "install-all": "npm install && npm install --prefix client && npm install --prefix server",
+    "postinstall": "npm run install-all",
+    "dev": "concurrently \"npm run dev --prefix client\" \"node server/index.js\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

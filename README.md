@@ -1,7 +1,7 @@
 # Bougie Budgeters (CEN3031-Group2)
 
 ## Requirements
-Node.js 18.18 or later
+- Node.js 18.18 or later
 
 ## Technology Stack
 - [Next.js](https://nextjs.org/learn/dashboard-app) (The React Framework for the Web)

@@ -21,5 +21,3 @@
 ## Start Coding
 - In the client folder is subdirectory src in the file page.js is code for our front-end (Next.js)
 - In the server folder in the file index.js is code for our back-end (Express.js)
-
-

@@ -16,7 +16,7 @@
 - Run server and client by running ``` npm run dev ``` in root folder
 - Close server with `Ctrl + C`
 > [!TIP] 
-> This may need to be done twice as the client side doesn't currently close gracefully
+> `Ctrl + C` may need to be done twice as the client side doesn't close gracefully
 
 ## Start Coding
 - In the client folder is subdirectory src in the file page.js is code for our front-end (Next.js)

@@ -14,8 +14,9 @@
 - Clone Repo
 - Install Dependencies by running ``` npm install ``` in root folder
 - Run server and client by running ``` npm run dev ``` in root folder
+- Close server with `Ctrl + C`
 > [!TIP] 
-> Close server ctrl + C, this may need to be done twice as the client side doesn't close currently close gracefully
+> This may need to be done twice as the client side doesn't currently close gracefully
 
 ## Start Coding
 - In the client folder is subdirectory src in the file page.js is code for our front-end (Next.js)

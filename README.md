@@ -6,6 +6,9 @@
 ## Technology Stack
 - [Next.js](https://nextjs.org/learn/dashboard-app) (The React Framework for the Web)
 - [Express.js](https://expressjs.com/en/guide/routing.html) (web framework for Node.js)
+- Styling
+    - [Bootstrap](https://getbootstrap.com/docs/5.0/getting-started/introduction/) (Powerful, extensible, and feature-packed frontend toolkit)
+    - [Tailswind](https://tailwindcss.com/docs/installation) (Rapidly build modern websites without ever leaving your HTML)
 
 ## Getting Started
 - Clone Repo

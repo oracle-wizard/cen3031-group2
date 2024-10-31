@@ -13,6 +13,7 @@
 ## Getting Started
 - Clone Repo
 - Install Dependencies by running ``` npm install ``` in root folder
+    - If you run into issues you may need to do ``` npm install ``` in both the client folder and server folder
 - Run server and client by running ``` npm run dev ``` in root folder
 - Shut down running applications with `Ctrl + C`
 > [!IMPORTANT]

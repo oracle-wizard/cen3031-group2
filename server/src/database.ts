@@ -33,8 +33,13 @@ export async function execute(query: string, params: any[] = []) {
   let connection;
   try {
     connection = await oracledb.getConnection();
-    const result = await connection.execute(query, params, { outFormat: oracledb.OUT_FORMAT_OBJECT });
-    return result.rows;
+    const result = await connection.execute(query, params, {
+      outFormat: oracledb.OUT_FORMAT_OBJECT,
+      autoCommit: true,  // Ensure changes are committed for INSERT/UPDATE/DELETE
+    });
+    
+    // Return rows if available, otherwise return an empty array
+    return result.rows || [];
   } catch (err) {
     console.error('Error executing query:', err);
     throw err;
@@ -48,3 +53,4 @@ export async function execute(query: string, params: any[] = []) {
     }
   }
 }
+

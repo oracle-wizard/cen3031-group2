@@ -47,3 +47,18 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+.btn-primary {
+  background-color: #4CAF50; /* Replace with your desired color */
+  border-color: #4CAF50;
+}
+
+.btn-primary:hover {
+  background-color: #45A049; /* Optional: Color when hovering */
+  border-color: #45A049;
+}
+
+.btn-primary:active {
+  background-color: #3e8e41; /* Color when clicked */
+  border-color: #3e8e41;
+}

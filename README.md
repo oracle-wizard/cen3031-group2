@@ -1,22 +1,50 @@
-# Bougie Budgeters (CEN3031-Group2)
+# React + TypeScript + Vite
 
-## Requirements
-- Node.js 18.18 or later
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Technology Stack
-- [Next.js](https://nextjs.org/learn/dashboard-app) (The React Framework for the Web)
-- [Express.js](https://expressjs.com/en/guide/routing.html) (web framework for Node.js)
-- Styling
-    - [Bootstrap](https://getbootstrap.com/docs/5.0/getting-started/introduction/) (Powerful, extensible, and feature-packed frontend toolkit)
-    - [Tailswind](https://tailwindcss.com/docs/installation) (Rapidly build modern websites without ever leaving your HTML)
+Currently, two official plugins are available:
 
-## Getting Started
-- Clone Repo
-- Install Dependencies by running ``` npm install ``` in root folder
-    - If you run into issues you may need to do ``` npm install ``` in both the client folder and server folder
-- Run server and client by running ``` npm run dev ``` in root folder
-- Shut down running applications with `Ctrl + C`
-> [!IMPORTANT]
-> `Ctrl + C` needs to be done twice. The client side remains running after the server is shut down
-- In the client folder is subdirectory src in the file page.js is code for our front-end (Next.js)
-- In the server folder in the file index.js is code for our back-end (Express.js)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
+
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
+
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
+```

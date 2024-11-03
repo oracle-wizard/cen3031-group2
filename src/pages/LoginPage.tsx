@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './styles/LoginPage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add form submission logic here
     console.log("Form submitted with email:", email, "and password:", password);
   };
+
+    // Function to navigate to the registration page
+    const goToRegister = () => {
+      navigate('/register');
+    };
 
   return (
     <div className="text-center">
@@ -46,8 +53,17 @@ const LoginPage: React.FC = () => {
             <input type="checkbox" value="remember-me" /> Remember me
           </label>
         </div>
-        
+        <div>
         <button className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        </div>
+        {/* Register Button Below with Margin */}
+          <button
+          type="button"
+          className="btn btn-lg btn-secondary btn-block mt-3" /* Added `mt-3` for spacing */
+          onClick={goToRegister}
+        >
+          Register
+        </button>
       </form>
     </div>
   );

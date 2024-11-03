@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="homepage">
-      <h1>Welcome to Our Website</h1>
+      <h1>Welcome to SummitSavings Test Menu</h1>
       <p>Click a button below to register or log in.</p>
       <button onClick={goToRegister} className="homepage-button">Register</button>
       <button onClick={goToLogin} className="homepage-button">Login</button>

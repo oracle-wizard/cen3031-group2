@@ -15,7 +15,7 @@ body {
   justify-content: center;
   padding-top: 40px;
   padding-bottom: 40px;
-  background-color: #f5f5f5;
+  background-color: #f5f5f5e5;
 }
 
 .form-signin {
@@ -47,18 +47,7 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-
-.btn-primary {
-  background-color: #4CAF50; /* Replace with your desired color */
-  border-color: #4CAF50;
-}
-
-.btn-primary:hover {
-  background-color: #45A049; /* Optional: Color when hovering */
-  border-color: #45A049;
-}
-
-.btn-primary:active {
-  background-color: #3e8e41; /* Color when clicked */
-  border-color: #3e8e41;
+/* Add specific margin if needed */
+.form-signin .btn-secondary {
+  margin-top: 15px; /* Adjust the spacing as desired */
 }

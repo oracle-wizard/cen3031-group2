@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './styles/RegistrationPage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -10,6 +11,13 @@ const RegistrationPage: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
+
+  // Function to navigate to the registration page
+  const goToLogin = () => {
+    navigate('/login');
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -19,22 +27,55 @@ const RegistrationPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add form submission logic here, e.g., sending data to backend
-    console.log("Form submitted with data:", formData);
+
+    if (formData.password !== formData.confirmPassword) {
+      setMessage("Passwords don't match!");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      if (response.ok) {
+        setMessage('User registered successfully.');
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+      } else {
+        const errorData = await response.json();
+        setMessage(`Error: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('Registration failed.');
+    }
   };
 
   return (
     <div className="text-center">
       <form className="form-register" onSubmit={handleSubmit}>
-        <img className="mb-4" src="./assets/summit.png" alt="Logo" width="144" height="144" />
+        <img className="mb-4" src="../assets/summit.png" alt="Logo" width="144" height="144" />
         <h1 className="h3 mb-3 font-weight-normal">Register Account</h1>
-        
-        <label htmlFor="inputFirstName" className="sr-only">First Name</label>
+
         <input
           type="text"
-          id="inputFirstName"
           name="firstName"
           className="form-control"
           placeholder="First Name"
@@ -44,10 +85,8 @@ const RegistrationPage: React.FC = () => {
           autoFocus
         />
 
-        <label htmlFor="inputLastName" className="sr-only">Last Name</label>
         <input
           type="text"
-          id="inputLastName"
           name="lastName"
           className="form-control"
           placeholder="Last Name"
@@ -56,10 +95,8 @@ const RegistrationPage: React.FC = () => {
           required
         />
 
-        <label htmlFor="inputEmail" className="sr-only">Email address</label>
         <input
           type="email"
-          id="inputEmail"
           name="email"
           className="form-control"
           placeholder="Email address"
@@ -68,10 +105,8 @@ const RegistrationPage: React.FC = () => {
           required
         />
 
-        <label htmlFor="inputPassword" className="sr-only">Password</label>
         <input
           type="password"
-          id="inputPassword"
           name="password"
           className="form-control"
           placeholder="Password"
@@ -80,10 +115,8 @@ const RegistrationPage: React.FC = () => {
           required
         />
 
-        <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
         <input
           type="password"
-          id="confirmPassword"
           name="confirmPassword"
           className="form-control"
           placeholder="Confirm Password"
@@ -91,8 +124,21 @@ const RegistrationPage: React.FC = () => {
           onChange={handleChange}
           required
         />
-        
+
+
+        <div>
         <button className="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+        </div>
+        {/* Home Button Below with Margin */}
+        <button
+          type="button"
+          className="btn btn-lg btn-secondary btn-block mt-3" /* Added `mt-3` for spacing */
+          onClick={goToLogin}
+        >
+          Sign in
+        </button>
+        
+        {message && <p className="message">{message}</p>}
       </form>
     </div>
   );

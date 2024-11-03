@@ -4,53 +4,21 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export async function initialize() {
-  try {
-    await oracledb.createPool({
-      user: process.env.ORACLE_USER,
-      password: process.env.ORACLE_PASSWORD,
-      connectString: process.env.ORACLE_CONNECT_STRING,
-      poolMin: 4,
-      poolMax: 10,
-      poolIncrement: 1,
-    });
-    console.log('Database pool created');
-  } catch (err) {
-    console.error('Error initializing database pool:', err);
-    throw err;
-  }
+  await oracledb.createPool({
+    user: process.env.ORACLE_USER,
+    password: process.env.ORACLE_PASSWORD,
+    connectString: process.env.ORACLE_CONNECT_STRING,
+  });
+  console.log('Database connection pool created');
 }
 
-export async function close() {
+export async function execute(query: string, binds: any = {}, options = {}) {
+  const connection = await oracledb.getConnection();
   try {
-    await oracledb.getPool().close(10);
-    console.log('Database pool closed');
-  } catch (err) {
-    console.error('Error closing database pool:', err);
-  }
-}
-
-export async function execute(query: string, params: any[] = []) {
-  let connection;
-  try {
-    connection = await oracledb.getConnection();
-    const result = await connection.execute(query, params, {
-      outFormat: oracledb.OUT_FORMAT_OBJECT,
-      autoCommit: true,  // Ensure changes are committed for INSERT/UPDATE/DELETE
-    });
-    
-    // Return rows if available, otherwise return an empty array
-    return result.rows || [];
-  } catch (err) {
-    console.error('Error executing query:', err);
-    throw err;
+    const result = await connection.execute(query, binds, options);
+    await connection.commit();
+    return result;
   } finally {
-    if (connection) {
-      try {
-        await connection.close();
-      } catch (err) {
-        console.error('Error closing connection:', err);
-      }
-    }
+    await connection.close();
   }
 }
-

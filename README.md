@@ -61,9 +61,4 @@ Frontend: http://localhost:5173
 
 Backend: http://localhost:3000/api/data
 
-
-6. To run LoginPage or RegistrationPage
-Use vscode and run the .html files. 
-Use css to update styling
-
 For more templates on creating pages use: https://getbootstrap.com/docs/4.1/getting-started/introduction/

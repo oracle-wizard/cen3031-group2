@@ -22,3 +22,12 @@ export async function execute(query: string, binds: any = {}, options = {}) {
     await connection.close();
   }
 }
+
+export async function closePool() {
+  try {
+    await oracledb.getPool().close(0);  // 0 waits for active connections to close
+    console.log('Database connection pool closed');
+  } catch (error) {
+    console.error('Error closing the database connection pool:', error);
+  }
+}

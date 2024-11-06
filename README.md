@@ -49,10 +49,7 @@ ORACLE_CONNECT_STRING=oracle.cise.ufl.edu:1521/orcl
 
 4. Run the project 
 
-Starting the backend, open the terminal in the server directory and run:
-npm run dev
-
-Starting the Frontend, open another terminal in the root folder directory and run:
+Starting both the backend and frontend in the root folder directory and run:
 npm run dev
 
 5. Access the application:

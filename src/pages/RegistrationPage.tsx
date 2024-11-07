@@ -58,6 +58,7 @@ const RegistrationPage: React.FC = () => {
           password: '',
           confirmPassword: '',
         });
+        goToLogin();
       } else {
         const errorData = await response.json();
         setMessage(`Error: ${errorData.error}`);

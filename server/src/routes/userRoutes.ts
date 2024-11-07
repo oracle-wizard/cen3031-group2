@@ -7,7 +7,7 @@ router.post('/register', async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
   const query = `
-    INSERT INTO users (first_name, last_name, email, password)
+    INSERT INTO "C.SMELTZER".users (first_name, last_name, email, password)
     VALUES (:firstName, :lastName, :email, :password)
   `;
 

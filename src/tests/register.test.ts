@@ -1,29 +1,34 @@
-// client/tests/register.test.ts
 import axios from 'axios';
 
 test('Registration page - valid registration', async () => {
-  const baseUrl = 'http://localhost:3000'; // Adjust if your server is running on a different port
+  const baseUrl = 'http://localhost:3000';
 
-  // Create mock user data for registration with correct field names
   const userData = {
-    firstName: "new",
+    firstName: "new1",
     lastName: "user",
-    email: "newuser@example.com",
+    email: "newuser1@example.com",
     password: "newpassword123"
   };
 
-  console.log('Request Data:', userData);
-
   try {
+    // Send the registration request
     const response = await axios.post(`${baseUrl}/api/register`, userData, {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    // Assert that the response status is 201 (created)
-    expect(response.status).toBe(201); // Assuming a successful registration returns 201
+    expect(response.status).toBe(201);
+
+    await axios.post(`${baseUrl}/api/delete`, { email: userData.email }, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
   } catch (error) {
-    // If the request fails, log and fail the test
-    console.error('Error during registration:', error);
-    fail('Registration request failed when it was expected to succeed.');
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error during registration:', error.message);
+      console.error('Error details:', error.response?.data);
+    } else {
+      console.error('Unexpected error:', error);
+    }
+    fail('Test failed due to error during registration or deletion.');
   }
 });

@@ -10,7 +10,8 @@
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "install-all": "npm install && npm --prefix server install"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",

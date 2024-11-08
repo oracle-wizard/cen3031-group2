@@ -23,7 +23,7 @@ jobs:
           command: "echo Hello, World!"
   test:
     docker:
-      - image: circleci/node:18 # Use a Node.js image for running tests
+      - image: cimg/node:18 # Use a Node.js image for running tests
     steps:
       - checkout
 

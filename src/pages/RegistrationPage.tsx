@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../axiosInstance'
 import './styles/RegistrationPage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -36,20 +37,15 @@ const RegistrationPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await api.post('/register', {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
-          password: formData.password,
-        }),
-      });
+          password: formData.password
+        }
+      );
 
-      if (response.ok) {
+      if (response.status ===200){
         setMessage('User registered successfully.');
         setFormData({
           firstName: '',
@@ -58,10 +54,13 @@ const RegistrationPage: React.FC = () => {
           password: '',
           confirmPassword: '',
         });
-      } else {
-        const errorData = await response.json();
-        setMessage(`Error: ${errorData.error}`);
-      }
+        const {accessToken } = response.data;
+
+        localStorage.setItem('accessToken', accessToken)
+      console.log( 'access token has been succcessfully stored at frontend') 
+      console.log(accessToken)
+        navigate('/login')
+      } //will throw an error if status code is not 2xx by default, no need for else anymore
     } catch (error) {
       console.error('Error:', error);
       setMessage('Registration failed.');

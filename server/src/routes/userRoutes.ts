@@ -1,23 +1,15 @@
 import { Router } from 'express';
-import { execute } from '../database';
-
+import {register, login, logout, resetPassword, verifyCode} from '../controllers/authController'
+import { refreshToken } from '../controllers/refreshTokenController';
+import {addBudget} from '../controllers/dashboard'
+import authToken from '../middleware/authenticateToken';
 const router = Router();
-
-router.post('/register', async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-
-  const query = `
-    INSERT INTO users (first_name, last_name, email, password)
-    VALUES (:firstName, :lastName, :email, :password)
-  `;
-
-  try {
-    await execute(query, { firstName, lastName, email, password });
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    console.error('Error during registration:', error);
-    res.status(500).json({ error: 'Registration failed' });
-  }
-});
-
+router.post('/register',  register);
+router.post('/login',  login);
+router.post('/refresh-token',  refreshToken)
+router.post('/dashboard', authToken,  addBudget ) ;
+router.get('/dashboard', authToken ) ;
+router.post('/reset-password', resetPassword)
+router.post('/logout', logout)
+router.post('/verify-code', verifyCode);
 export default router;

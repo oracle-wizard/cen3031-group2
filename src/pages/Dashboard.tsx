@@ -54,11 +54,10 @@ const   Dashboard: React.FC = () =>{
                     className="form-control"
                     value={budget}
                     onChange={handleChange}
-                    placeholder="Enter your budget"
-                    />
+                    placeholder="Enter your budget"/>
             </div>
             <button type="submit" className="btn btn-primary mt-3">
-                Submit
+            Submit
             </button>
         </form>
         {message && <div className='alert alert-info mt-3'>{message}</div>}

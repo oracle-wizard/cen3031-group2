@@ -67,7 +67,7 @@ export const login = async(req, res) =>{
           sameSite:'Lax',
           domain: 'localhost',
           path: '/',
-          maxAge: 10*60*1000
+          maxAge: 24*60*60*1000
        }
     )      
     res.status(200).json({accessToken})
@@ -137,7 +137,7 @@ export const verifyCode = async(req: Request, res: Response)=>{
       }
       else{
         res.status(400)
-        console.log("no code provides in the request")
+        console.log("no code provided in the request")
       }
     }
     else{

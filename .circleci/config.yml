@@ -26,12 +26,16 @@ jobs:
       - image: cimg/node:20.18.0 # Use a Node.js image for running tests
     steps:
       - checkout
-
       # Install dependencies
       - run:
           name: Install dependencies
           command: npm run install-all
-
+      - run:
+          name: Create .env file
+          command: |
+            echo "ORACLE_USER=$ORACLE_USER" >> .env
+            echo "ORACLE_PASSWORD=$ORACLE_PASSWORD" >> .env
+            echo "ORACLE_CONNECT_STRING=$ORACLE_CONNECT_STRING" >> .env
       # Start the server in the background
       - run:
           name: Start server

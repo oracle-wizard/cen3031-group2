@@ -39,5 +39,20 @@ router.post('/delete', async (req, res) => {
   }
 });
 
+router.put('/update-profile', async (req, res) => {
+  const { username, email, firstName, lastName } = req.body;
+  const query = `
+    UPDATE "C.SMELTZER".users
+    SET email = :email, first_name = :firstName, last_name = :lastName
+    WHERE username = :username
+`;
+  try {
+    await execute(query, [email, firstName, lastName, username], { autoCommit: true });
+    res.status(200).json({ message: 'Profile updated successfully!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+});
 
 export default router;

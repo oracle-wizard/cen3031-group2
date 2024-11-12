@@ -4,6 +4,9 @@ import HomePage from './pages/HomePage';
 import RegistrationPage from './pages/RegistrationPage';
 import LoginPage from './pages/LoginPage';
 import UpdateProfile from './pages/AccountUpdate';
+import Dashboard from './pages/Dashboard';
+import ResetPassword from './pages/ResetPasswordPage';
+import ExpenseTracker from './pages/ExpenseTracker.tsx';
 import './App.css';
 
 const App: React.FC = () => {
@@ -14,7 +17,10 @@ const App: React.FC = () => {
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/update-profile" element={<UpdateProfile />} />
-      </Routes>
+        <Route path="/dashboard" element ={<Dashboard/>} />
+        <Route path = "/reset-password" element = {<ResetPassword/>}/>
+        <Route path="/expenseTracker" element={<ExpenseTracker />} /> 
+        </Routes>
     </Router>
   );
 };

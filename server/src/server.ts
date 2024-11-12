@@ -1,13 +1,18 @@
 import * as express from 'express';
 const cors = require('cors');
 import userRoutes from './routes/userRoutes';
-import { initialize, closePool } from './database';  // Import closePool function
+import { initialize } from './database';
+import  * as cookieParser from 'cookie-parser'
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser())
 
 // Initialize the database connection pool
 initialize()

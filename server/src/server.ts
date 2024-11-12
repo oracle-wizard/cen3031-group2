@@ -1,8 +1,9 @@
+// server.ts
 import * as express from 'express';
 const cors = require('cors');
 import userRoutes from './routes/userRoutes';
 import { closePool, initialize } from './database';
-import  * as cookieParser from 'cookie-parser'
+import * as cookieParser from 'cookie-parser';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,7 +13,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
 // Initialize the database connection pool
 initialize()
@@ -31,7 +32,7 @@ const server = app.listen(PORT, () => {
 // Handle graceful shutdown
 const gracefulShutdown = async () => {
   console.log('Shutting down gracefully...');
-  await closePool();  // Close the database pool
+  await closePool(); // Close the database pool
   server.close(() => {
     console.log('HTTP server closed');
     process.exit(0);
@@ -39,5 +40,5 @@ const gracefulShutdown = async () => {
 };
 
 // Listen for termination signals
-process.on('SIGINT', gracefulShutdown);  // Handle Ctrl+C in terminal
+process.on('SIGINT', gracefulShutdown); // Handle Ctrl+C in terminal
 process.on('SIGTERM', gracefulShutdown); // Handle termination signal from system

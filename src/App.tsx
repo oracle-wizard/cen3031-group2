@@ -4,7 +4,8 @@ import HomePage from './pages/HomePage';
 import RegistrationPage from './pages/RegistrationPage';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
-import ResetPassword from './pages/ResetPasswordPage'
+import ResetPassword from './pages/ResetPasswordPage';
+import ExpenseTracker from './pages/ExpenseTracker.tsx';
 import './App.css';
 
 const App: React.FC = () => {
@@ -16,6 +17,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element ={<Dashboard/>} />
         <Route path = "/reset-password" element = {<ResetPassword/>}/>
+        <Route path="/expenseTracker" element={<ExpenseTracker />} /> {/* New route */}
         </Routes>
     </Router>
   );

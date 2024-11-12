@@ -1,7 +1,7 @@
 import * as express from 'express';
 const cors = require('cors');
 import userRoutes from './routes/userRoutes';
-import { initialize } from './database';
+import { closePool, initialize } from './database';
 import  * as cookieParser from 'cookie-parser'
 
 const app = express();

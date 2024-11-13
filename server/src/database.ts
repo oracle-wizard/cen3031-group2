@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+
 export async function initialize() {
   await oracledb.createPool({
     user: process.env.ORACLE_USER,

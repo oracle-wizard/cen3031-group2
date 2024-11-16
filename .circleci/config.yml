@@ -35,9 +35,9 @@ jobs:
                 COMPOSE_DOCKER_CLI_EXPERIMENTAL: 1
 
       - run:
-        name: storing local IP address
-        command: node -p "require('ip').address()" > logs/ip.log       
-            
+          name: storing local IP address
+          command: node -p "require('ip').address()" > logs/ip.log       
+
       # Start Docker Compose services
       - run:
           name: Start services with Docker Compose

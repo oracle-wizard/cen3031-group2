@@ -24,6 +24,10 @@ initialize()
     process.exit(1); // Exit if database connection fails
   });
 
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Server is up and running' });
+});
+
 app.use('/api', userRoutes);
 
 const server = app.listen(PORT, () => {

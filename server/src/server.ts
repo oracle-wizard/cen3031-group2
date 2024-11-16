@@ -6,6 +6,7 @@ import { closePool, initialize } from './database';
 import * as cookieParser from 'cookie-parser';
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({

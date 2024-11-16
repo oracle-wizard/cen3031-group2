@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 test('Registration page - valid registration', async () => {
-  const baseUrl = 'http://localhost:3000';
+  const baseUrl = 'http://127.0.0.1:3000';
 
   const userData = {
     firstName: "new",

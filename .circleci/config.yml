@@ -30,12 +30,14 @@ jobs:
       - run:
           name: Install dependencies
           command: npm run install-all
+
       - run:
           name: Create .env file
           command: |
-            echo "ORACLE_USER=$ORACLE_USER" >> .env
-            echo "ORACLE_PASSWORD=$ORACLE_PASSWORD" >> .env
-            echo "ORACLE_CONNECT_STRING=$ORACLE_CONNECT_STRING" >> .env
+            echo "ORACLE_USER=$ORACLE_USER" >> server/.env
+            echo "ORACLE_PASSWORD=$ORACLE_PASSWORD" >> server/.env
+            echo "ORACLE_CONNECT_STRING=$ORACLE_CONNECT_STRING" >> server/.env
+            echo "JWT_SECRET=$JWT_SECRET" >> server/.env
       # Start the client server in the background
       - run:
           name: Start the client server

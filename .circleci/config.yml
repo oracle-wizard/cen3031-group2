@@ -31,7 +31,7 @@ jobs:
           name: Install dependencies
           command: npm run install-all
       - run:
-                name: Install Oracle Instant Client
+          name: Install Oracle Instant Client
           command: |
             sudo apt-get update
             sudo apt-get install -y libaio1

@@ -36,12 +36,20 @@ jobs:
             echo "ORACLE_USER=$ORACLE_USER" >> .env
             echo "ORACLE_PASSWORD=$ORACLE_PASSWORD" >> .env
             echo "ORACLE_CONNECT_STRING=$ORACLE_CONNECT_STRING" >> .env
-      # Start the server in the background
+      # Start the client server in the background
+      - run:
+          name: Start the client server
+          command: |
+            npm run dev &
+            sleep 5
+
+      # Start the express server in the background
       - run:
           name: Start server
           command: |
-            npm run dev & # Adjust if your server start command is different
-            sleep 5 # Wait for server to start
+            cd server
+            npm run dev &
+            sleep 5        
 
       # Run the client tests
       - run:

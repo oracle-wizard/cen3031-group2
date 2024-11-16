@@ -24,6 +24,7 @@ jobs:
   test:
     docker:
       - image: cimg/node:20.18.0 # Use a Node.js image for running tests
+        user: root  # Use root user
     steps:
       - checkout
       # Install dependencies

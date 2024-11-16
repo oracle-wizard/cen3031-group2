@@ -39,8 +39,11 @@ jobs:
           name: Start services with Docker Compose
           command: |
             docker-compose up -d  # Start all services in the background
-            sleep 5
+            sleep 10
 
+      - run:
+          name: View Backend Logs
+          command: docker-compose logs backend
       # # Start the client server in the background
       # - run:
       #     name: Start the client server

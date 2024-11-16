@@ -1,0 +1,15 @@
+version: '3'
+services:
+  backend:
+    image: cimg/node:20.18.0
+    environment:
+      NODE_ENV: development
+      BACKEND_PORT: 3000
+    volumes:
+      - ./server:/server  # Mount the backend code directory
+    command: npm run dev
+  frontend:
+    image: cimg/node:20.18.0
+    volumes:
+      - ./:/app  # Mount the frontend code directory
+    command: npm run dev

@@ -30,7 +30,16 @@ jobs:
       - run:
           name: Install dependencies
           command: npm run install-all
-
+      - run:
+                name: Install Oracle Instant Client
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libaio1
+            wget https://download.oracle.com/otn_software/linux/instantclient/191000/oracle-instantclient-basic-linuxx64-19.10.0.0.0dbru.zip
+            unzip oracle-instantclient-basic-linuxx64-19.10.0.0.0dbru.zip
+            sudo mv instantclient_19_10 /usr/local/
+            sudo ln -s /usr/local/instantclient_19_10 /usr/local/instantclient
+            sudo ldconfig
       - run:
           name: Create .env file
           command: |

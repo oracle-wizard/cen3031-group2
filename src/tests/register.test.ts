@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from "../axiosInstance";
 
 test('Registration page - valid registration', async () => {
   const baseUrl = 'http://localhost:3000';
@@ -9,26 +9,14 @@ test('Registration page - valid registration', async () => {
     email: "newuser1@example.com",
     password: "newpassword123"
   };
-
-  try {
     // Send the registration request
-    const response = await axios.post(`${baseUrl}/api/register`, userData, {
+    const response = await api.post(`${baseUrl}/register`, userData, {
       headers: { 'Content-Type': 'application/json' },
     });
 
     expect(response.status).toBe(201);
 
-    await axios.post(`${baseUrl}/api/delete`, { email: userData.email }, {
+    await api.post(`${baseUrl}/delete`, { email: userData.email }, {
       headers: { 'Content-Type': 'application/json' },
     });
-
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('Axios error during registration:', error.message);
-      console.error('Error details:', error.response?.data);
-    } else {
-      console.error('Unexpected error:', error);
-    }
-    fail('Test failed due to error during registration or deletion.');
-  }
 });

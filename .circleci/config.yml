@@ -25,6 +25,12 @@ jobs:
     docker:
       - image: cimg/node:20.18.0 # Use a Node.js image for running tests
         user: root  # Use root user
+    services:
+      - name: backend  # Express backend service
+        image: cimg/node:20.18.0  # Ensure backend uses the same Node image or your custom backend image
+        environment:
+          NODE_ENV: development  # Set to development mode for backend
+          BACKEND_PORT: 3000  # Port for backend service        
     steps:
       - checkout
       # Install dependencies
@@ -39,6 +45,12 @@ jobs:
             echo "ORACLE_PASSWORD=$ORACLE_PASSWORD" >> server/.env
             echo "ORACLE_CONNECT_STRING=$ORACLE_CONNECT_STRING" >> server/.env
             echo "JWT_SECRET=$JWT_SECRET" >> server/.env
+
+      - run:
+          name: Set up environment variables for frontend
+          command: |
+            echo "REACT_APP_BACKEND_URL=http://backend:3000" >> .env
+
       # Start the client server in the background
       - run:
           name: Start the client server

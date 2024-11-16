@@ -51,7 +51,7 @@ jobs:
           command: |
             cd server
             npm run dev &
-            sleep 5        
+            sleep 10        
 
       # Run the client tests
       - run:

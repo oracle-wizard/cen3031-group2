@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {register, login, logout, resetPassword, verifyCode, deleteUser, setNewPassword, getUsers} from '../controllers/authController'
+import {register, login, logout, resetPassword, verifyCode, deleteUser, setNewPassword} from '../controllers/authController'
 import { refreshToken } from '../controllers/refreshTokenController';
 import {addBudget} from '../controllers/dashboard'
 import authToken from '../middleware/authenticateToken';
@@ -16,8 +16,7 @@ router.get('/expenseTracker', authToken, getExpenses);
 router.post('/reset-password', resetPassword);
 router.post('/logout', logout);
 router.post('/verify-code', verifyCode);
-router.delete('/delete', deleteUser);
-router.get('/user', authToken, getUsers);
+router.post('/delete', deleteUser);
 router.post('/new-password', setNewPassword)
 //router.get('/expenses', getExpenses);
 //router.post('/expenses', addExpense);

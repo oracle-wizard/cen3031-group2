@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt'
 import generateAndSend from "../middleware/sendEmail";
 
 import { refreshToken } from "./refreshTokenController";
+
 interface User{
   firstName: string,
   lastName: string,
@@ -174,27 +175,6 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ error: 'Deletion failed' });
   }
 };
-
-export const getUsers = async (req, res) => {
-  const query = 'SELECT * FROM "C.SMELTZER".USERS';
-
-  try {
-    // Execute the query to fetch users
-    const result = await execute(query);
-
-    // Ensure result and result.rows are defined and check if any users were found
-    if (!result || !result.rows || result.rows.length === 0) {
-      return res.status(404).json({ message: 'No users found' });
-    }
-
-    // Return the list of users
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
-};
-
 
 export const setNewPassword = async(req, res)=>{
     if(!req.body.password || !req.body.email){

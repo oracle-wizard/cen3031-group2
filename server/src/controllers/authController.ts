@@ -4,6 +4,7 @@ import { execute } from '../database';
 import { generateToken } from "./generateToken";
 import * as bcrypt from 'bcrypt'
 import generateAndSend from "../middleware/sendEmail";
+
 import { refreshToken } from "./refreshTokenController";
 interface User{
   firstName: string,
@@ -13,7 +14,7 @@ interface User{
   password: string
 }
 
-export const register = async ( req, res)  => {
+export const register = async ( req: Request, res: Response)  => {
     const { firstName, lastName, email, password } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -31,7 +32,7 @@ export const register = async ( req, res)  => {
          sameSite: 'strict',
          maxAge: 60*60*1000
        }
-     )      
+     )     
      res.status(200).json({accessToken})
     } 
     catch (error) {
@@ -144,8 +145,36 @@ export const verifyCode = async(req: Request, res: Response)=>{
   catch(err){
     res.sendStatus(500)
   }
-
 }
+
+export const deleteUser = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required to delete a user' });
+  }
+
+  const query = `
+    DELETE FROM "C.SMELTZER".USERS
+    WHERE email = :email`;
+
+  try {
+    // Execute the query to delete the user
+    const result = await execute(query, { email });
+
+    // If no rows were affected, the user was not found
+    if (result.rowsAffected === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Return a success response
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error during user deletion:', error);
+    res.status(500).json({ error: 'Deletion failed' });
+  }
+};
+
 export const setNewPassword = async(req, res)=>{
     if(!req.body.password || !req.body.email){
       res.sendStatus(400);
@@ -174,4 +203,4 @@ export const setNewPassword = async(req, res)=>{
   }
 
 }
-export default {register, login, logout, verifyCode, setNewPassword};
+export default {register, login, logout, verifyCode, deleteUser, setNewPassword};

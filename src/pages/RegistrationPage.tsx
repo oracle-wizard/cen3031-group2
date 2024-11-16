@@ -57,7 +57,7 @@ const RegistrationPage: React.FC = () => {
       );
 
 
-      if (response.status ===200){
+      if (response.status === 200){
         setMessage('User registered successfully.');
         setFormData({
           firstName: '',
@@ -67,7 +67,6 @@ const RegistrationPage: React.FC = () => {
           confirmPassword: '',
         });
         const {accessToken } = response.data;
-
         localStorage.setItem('accessToken', accessToken)
       console.log( 'access token has been succcessfully stored at frontend') 
       console.log(accessToken)

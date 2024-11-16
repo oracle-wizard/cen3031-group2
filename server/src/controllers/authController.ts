@@ -4,6 +4,7 @@ import { execute } from '../database';
 import { generateToken } from "./generateToken";
 import * as bcrypt from 'bcrypt'
 import generateAndSend from "../middleware/sendEmail";
+import { refreshToken } from "./refreshTokenController";
 interface User{
   firstName: string,
   lastName: string,
@@ -95,8 +96,9 @@ export const resetPassword = async(req: Request, res: Response)=>{
   }
   try{
       await generateAndSend(email);
-      res.status(200).json('Verification code sent to your email.');
-  }
+      res.sendStatus(200)
+      console.log("sendind status 200..")}
+
   catch(err){
     res.status(500).json('An error occured while sending the verification code.');
   }
@@ -119,35 +121,57 @@ export const verifyCode = async(req: Request, res: Response)=>{
     const response = await execute(query, {email: req.body.email});
     if(response.rows && response.rows.length>0 ){
       const user = response.rows[0];
-      console.log('user[0]',user[0])
 
       if(parseInt(code)===user[0]){
-
-        console.log("codes match")
         const expiryTime = 10*60*1000;
         const currentTime = new Date().getTime();
         const codeAge = currentTime - new Date(user[1]).getTime();
         if(codeAge<=expiryTime){
           res.sendStatus(200);
-          console.log("Successfull")
         }else{
           res.sendStatus(400);
-          console.log("expired")
         }
       }
       else{
-        res.status(400)
-        console.log("no code provides in the request")
+        res.sendStatus(400)
+        console.log("No code provided in the request")
       }
     }
     else{
-      res.status(400)
+      res.sendStatus(400)
     }
   }
   catch(err){
-    console.log(err)
     res.sendStatus(500)
   }
 
 }
-export default {register, login, logout};
+export const setNewPassword = async(req, res)=>{
+    if(!req.body.password || !req.body.email){
+      res.sendStatus(400);
+      console.log(" no req body info ")
+      return;
+    }
+    console.log("attempting to set a new password..")
+  const email  = req.body.email;
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const query = 'UPDATE "C.SMELTZER".USERS SET password = :hashedPassword WHERE email= :email';
+  try{
+    await execute(query, {hashedPassword, email});
+    console.log("successfully ecexuted the query")
+    const {accessToken, refreshToken} = generateToken(res, email);
+      console.log(`refresh token ${refreshToken}`)
+      res.cookie('refreshToken', refreshToken, 
+        {httpOnly:true, 
+         sameSite: 'strict',
+         maxAge: 60*60*1000
+       }
+     )      
+     res.status(201).json({accessToken})
+
+  }catch(err){
+    res.sendStatus(500);
+  }
+
+}
+export default {register, login, logout, verifyCode, setNewPassword};

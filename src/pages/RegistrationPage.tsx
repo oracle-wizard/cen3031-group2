@@ -19,7 +19,13 @@ const RegistrationPage: React.FC = () => {
   const goToLogin = () => {
     navigate('/login');
   };
-
+  const validatePassword = (password : string)=>{
+   
+    if(password.length<8 || !/\d/.test(password) || ! /[A-Z]/.test(password) ||  ! /[a-z]/.test(password) ){
+        return 'Password must contain at least one number.'
+    }
+    return '';
+   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -35,6 +41,11 @@ const RegistrationPage: React.FC = () => {
       setMessage("Passwords don't match!");
       return;
     }
+    const  passwordErr = validatePassword(formData.password);
+    if(passwordErr){
+      setMessage(`Password must be at least 8 characters, 1 number, 1 special character, 1 uppercase.`);
+      return;
+    }
 
     try {
       const response = await api.post('/register', {
@@ -44,6 +55,7 @@ const RegistrationPage: React.FC = () => {
           password: formData.password
         }
       );
+
 
       if (response.status ===200){
         setMessage('User registered successfully.');

@@ -42,8 +42,16 @@ export const generateAndSend =async (email:String)=>{
         console.log(err)
     }
     const currentDate = new Date();
-    const query = 'INSERT INTO "ALIASHYNSKA".tempcodes(email, code, createdAt) VALUES(:email, :verificationCode, :currentDate)';
    try{
+        const checkQuery = 'SELECT COUNT(*) FROM "ALIASHYNSKA".tempcodes WHERE email = :email';
+        const result= await execute(checkQuery, {email});
+        console.log("searching..")
+        if(result.rows && result.rows[0][0] > 0){
+            const deleteQuery = 'DELETE FROM "ALIASHYNSKA".tempcodes WHERE email = :email ';
+            console.log("deleting...")
+            await execute(deleteQuery,{email})
+        }
+        const query = 'INSERT INTO "ALIASHYNSKA".tempcodes(email, code, createdAt) VALUES(:email, :verificationCode, :currentDate)'
        await execute(query, {email, verificationCode, currentDate});
        console.log("successfully inserted")
     }

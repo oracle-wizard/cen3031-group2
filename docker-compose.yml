@@ -7,12 +7,13 @@ services:
       BACKEND_PORT: 3000
     volumes:
       - ./server:/server  # Mount the backend code directory
+    working_dir: /server   # Set the working directory to /server
     ports:
       - "3000:3000"  # Expose backend service on port 3000
     command: npm run dev
-
   frontend:
     image: cimg/node:20.18.0
     volumes:
       - ./:/app  # Mount the frontend code directory
+    working_dir: /app  # Make sure the working directory is correct for npm run dev
     command: npm run dev

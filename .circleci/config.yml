@@ -30,11 +30,10 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
           setup_remote_docker:
-            - image: cimg/python:3.8  # Optional: you can add any additional Docker images needed
             - environment:
                 DOCKER_BUILDKIT: 1
                 COMPOSE_DOCKER_CLI_EXPERIMENTAL: 1
-
+                
       # Start Docker Compose services
       - run:
           name: Start services with Docker Compose

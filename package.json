@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "jest",
-    "dev:client": "vite",
-    "dev:server": "npm run dev --prefix server",
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -3,7 +3,7 @@ import {register, login, logout, resetPassword, verifyCode, deleteUser, setNewPa
 import { refreshToken } from '../controllers/refreshTokenController';
 import {addBudget} from '../controllers/dashboard'
 import authToken from '../middleware/authenticateToken';
-import { getExpenses, addExpense } from '../controllers/expenseController';
+import { getExpenses, addExpense, updateExpense, deleteExpense } from '../controllers/expenseController';
 
 
 const router = Router();
@@ -14,6 +14,8 @@ router.post('/dashboard', authToken,  addBudget ) ;
 router.get('/dashboard', authToken ) ;
 router.get('/expenseTracker', authToken, getExpenses);
 router.post('/expenses', authToken, addExpense);
+router.put('/expenses', authToken, updateExpense);
+router.delete('/expenses', authToken, deleteExpense);
 router.post('/reset-password', resetPassword);
 router.post('/logout', logout);
 router.post('/verify-code', verifyCode);

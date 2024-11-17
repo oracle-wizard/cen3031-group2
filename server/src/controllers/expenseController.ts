@@ -82,3 +82,54 @@ export const addExpense = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Failed to add expense' });
     }
 };
+export const updateExpense = async (req: Request, res: Response) => {
+  try {
+      const { expense_id, expense_title, category_name, expense_amount, expense_date, description } = req.body;
+
+      const query = `
+          UPDATE "C.SMELTZER"."EXPENSE"
+          SET 
+              "EXPENSE_TITLE" = :EXPENSE_TITLE,
+              "CATEGORY_NAME" = :CATEGORY_NAME,
+              "EXPENSE_AMOUNT" = :EXPENSE_AMOUNT,
+              "EXPENSE_DATE" = TO_DATE(:EXPENSE_DATE, 'YYYY-MM-DD'),
+              "DESCRIPTION" = :DESCRIPTION
+          WHERE "EXPENSE_ID" = :EXPENSE_ID
+      `;
+
+      const binds = {
+          EXPENSE_ID: expense_id,
+          EXPENSE_TITLE: expense_title,
+          CATEGORY_NAME: category_name,
+          EXPENSE_AMOUNT: expense_amount,
+          EXPENSE_DATE: expense_date,
+          DESCRIPTION: description || null
+      };
+
+      await execute(query, binds);
+
+      res.status(200).json({ message: 'Expense updated successfully' });
+  } catch (error) {
+      console.error('Error updating expense:', error);
+      res.status(500).json({ error: 'Failed to update expense' });
+  }
+};
+export const deleteExpense = async (req: Request, res: Response) => {
+  try {
+      const { expense_id } = req.body;
+
+      const query = `
+          DELETE FROM "C.SMELTZER"."EXPENSE"
+          WHERE "EXPENSE_ID" = :EXPENSE_ID
+      `;
+
+      const binds = { EXPENSE_ID: expense_id };
+
+      await execute(query, binds);
+
+      res.status(200).json({ message: 'Expense deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting expense:', error);
+      res.status(500).json({ error: 'Failed to delete expense' });
+  }
+};

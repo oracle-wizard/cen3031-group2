@@ -1,40 +1,84 @@
-// controllers/expenseController.ts
 import { Request, Response } from 'express';
 import { execute } from '../database';
 
 export const getExpenses = async (req: Request, res: Response) => {
-    try {
-      // Get the logged-in user's email
+  try {
+      // Extract only the email from req.user
       const userEmail = req.user?.email;
-      console.log("Logged-in user's email:", userEmail); // Debugging log
-  
-      // Query to fetch expenses based on the logged-in user's email
+      if (!userEmail) {
+          throw new Error("User email not found in request");
+      }
+      console.log("Logged-in user's email:", userEmail);
+
       const query = `
-        SELECT 
-          "EXPENSE_ID", 
-          "EXPENSE_TITLE", 
-          "CATEGORY_NAME", 
-          "EXPENSE_AMOUNT", 
-          "EXPENSE_DATE", 
-          "DESCRIPTION",
-          "EMAIL"
-        FROM "C.SMELTZER"."EXPENSE"
-        WHERE LOWER("EMAIL") = LOWER(:EMAIL)
+          SELECT 
+            "EXPENSE_ID", 
+            "EXPENSE_TITLE", 
+            "CATEGORY_NAME", 
+            "EXPENSE_AMOUNT", 
+            "EXPENSE_DATE", 
+            "DESCRIPTION",
+            "EMAIL"
+          FROM "C.SMELTZER"."EXPENSE"
+          WHERE LOWER("EMAIL") = LOWER(:EMAIL)
       `;
-  
-      const binds = { EMAIL: userEmail };
-      console.log("Executing query with binds:", query);
-      console.log("With binds:", binds);
-  
+
+      const binds = { EMAIL: userEmail }; // Bind only the email
+      console.log("Executing query with binds:", binds);
+
       // Execute the query
       const result = await execute(query, binds);
-      console.log("Fetched expenses:", result.rows);
-  
-      // Return the fetched expenses as the response
+      console.log("Result rows:", result.rows);
+
+      // Send only the rows to the client
       res.status(200).json(result.rows);
-    } catch (error) {
+  } catch (error) {
       console.error('Error fetching expenses:', error);
       res.status(500).json({ error: 'Failed to retrieve expenses' });
+  }
+};
+
+export const addExpense = async (req: Request, res: Response) => {
+    try {
+        const userEmail = req.user?.email; // Ensure the user's email is available
+        console.log("Logged-in user's email in addExpense:", userEmail); // Debugging
+
+        const { expense_title, category_name, expense_amount, expense_date, description } = req.body;
+
+        const query = `
+            INSERT INTO "C.SMELTZER"."EXPENSE" (
+                "EXPENSE_TITLE", 
+                "CATEGORY_NAME", 
+                "EXPENSE_AMOUNT", 
+                "EXPENSE_DATE", 
+                "DESCRIPTION", 
+                "EMAIL"
+            ) VALUES (
+                :EXPENSE_TITLE, 
+                :CATEGORY_NAME, 
+                :EXPENSE_AMOUNT, 
+                TO_DATE(:EXPENSE_DATE, 'YYYY-MM-DD'), 
+                :DESCRIPTION, 
+                :EMAIL
+            )
+        `;
+
+        const binds = {
+            EXPENSE_TITLE: expense_title,
+            CATEGORY_NAME: category_name,
+            EXPENSE_AMOUNT: expense_amount,
+            EXPENSE_DATE: expense_date,
+            DESCRIPTION: description || null,
+            EMAIL: userEmail
+        };
+
+        console.log("Insert binds:", binds); // Debugging log to see if EMAIL is being passed
+
+        await execute(query, binds);
+
+        res.status(200).json({ message: 'Expense added successfully' });
+    } catch (error) {
+        console.error('Error adding expense:', error);
+        res.status(500).json({ error: 'Failed to add expense' });
     }
-  };
-  
+};

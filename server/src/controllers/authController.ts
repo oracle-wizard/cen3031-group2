@@ -4,7 +4,6 @@ import { execute } from '../database';
 import { generateToken } from "./generateToken";
 import * as bcrypt from 'bcrypt'
 import generateAndSend from "../middleware/sendEmail";
-
 import { refreshToken } from "./refreshTokenController";
 
 interface User{

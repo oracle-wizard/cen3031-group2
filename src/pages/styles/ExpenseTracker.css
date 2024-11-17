@@ -1,68 +1,75 @@
-/* ExpenseTracker.css */
-
 .expense-tracker-container {
-    width: 80%;
-    margin: auto;
-    text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
 }
 
 .expense-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    margin-bottom: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
 }
 
-.expense-table th, .expense-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+.expense-table th,
+.expense-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
 }
 
 .expense-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
+  background-color: #f4f4f4;
 }
 
-.expense-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+.expense-table tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-/* New Expense Form */
+.expense-table tr:hover {
+  background-color: #f1f1f1;
+}
+
 .new-expense-form {
-    margin-top: 20px;
-    text-align: left;
-}
-
-.new-expense-form h3 {
-    text-align: center;
-}
-
-.new-expense-form form {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    padding: 10px;
+  margin-top: 20px;
 }
 
 .new-expense-form input,
-.new-expense-form textarea,
-.new-expense-form button {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
+.new-expense-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .new-expense-form button {
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    border: none;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .new-expense-form button:hover {
-    background-color: #0056b3;
+  background-color: #45a049;
+}
+
+button {
+  padding: 5px 10px;
+  margin: 0 5px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }

@@ -1,4 +1,3 @@
-// ExpenseTracker.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../axiosInstance';
@@ -24,25 +23,27 @@ const ExpenseTracker: React.FC = () => {
     description: ''
   });
 
+  const [editingId, setEditingId] = useState<number | null>(null); // To track the editing row
+  const [editingExpense, setEditingExpense] = useState<Partial<Expense> | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
       navigate('/login');
     } else {
-      fetchExpenses();  // Fetch expenses when the component loads
+      fetchExpenses(); // Fetch expenses when the component loads
     }
   }, [navigate]);
 
   const fetchExpenses = async () => {
     try {
       const response = await api.get('/expenseTracker', { withCredentials: true });
-      console.log("API response data:", response.data); // Log the response to verify
       setExpenses(response.data.map((item: any) => ({
         expense_id: item[0],
         expense_title: item[1],
         category_name: item[2],
         expense_amount: item[3],
-        expense_date: new Date(item[4]).toLocaleDateString(), // Formatting the date
+        expense_date: new Date(item[4]).toLocaleDateString(),
         description: item[5] || '-'
       })));
     } catch (error) {
@@ -58,13 +59,69 @@ const ExpenseTracker: React.FC = () => {
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post('/expenses', newExpense, { withCredentials: true });
-      if (response.status === 200) {
-        setExpenses([...expenses, response.data]);  // Add the new expense to the list
-        setNewExpense({ expense_title: '', category_name: '', expense_amount: '', expense_date: '', description: '' });
-      }
+      await api.post('/expenses', newExpense, { withCredentials: true });
+      setNewExpense({
+        expense_title: '',
+        category_name: '',
+        expense_amount: '',
+        expense_date: '',
+        description: ''
+      });
+      await fetchExpenses();
     } catch (error) {
       console.log('Error adding expense:', error);
+    }
+  };
+
+  const handleEdit = (expense: Expense) => {
+    setEditingId(expense.expense_id);
+    setEditingExpense({ ...expense });
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditingExpense((prev) => {
+        if (name === 'expense_date') {
+            // Format the date to YYYY-MM-DD
+            const formattedDate = new Date(value).toISOString().split('T')[0];
+            return { ...prev!, [name]: formattedDate };
+        }
+        return { ...prev!, [name]: value };
+    });
+};
+
+
+  const handleSaveEdit = async () => {
+    if (editingExpense) {
+      try {
+        // Send PUT request to update the expense in the database
+        await api.put('/expenses', editingExpense, { withCredentials: true });
+
+        // Update the local state
+        const updatedExpenses = expenses.map((expense) =>
+          expense.expense_id === editingExpense.expense_id ? { ...expense, ...editingExpense } : expense
+        );
+        setExpenses(updatedExpenses);
+        setEditingId(null);
+        setEditingExpense(null);
+      } catch (error) {
+        console.log('Error updating expense:', error);
+      }
+    }
+  };
+
+  const handleDelete = async (expenseId: number) => {
+    try {
+      // Send DELETE request to remove the expense from the database
+      await api.delete('/expenses', {
+        data: { expense_id: expenseId },
+        withCredentials: true
+      });
+
+      // Update the local state
+      setExpenses((prev) => prev.filter((expense) => expense.expense_id !== expenseId));
+    } catch (error) {
+      console.log('Error deleting expense:', error);
     }
   };
 
@@ -81,22 +138,77 @@ const ExpenseTracker: React.FC = () => {
             <th>Amount ($)</th>
             <th>Date</th>
             <th>Description</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {expenses.length > 0 ? (
             expenses.map((expense) => (
               <tr key={expense.expense_id}>
-                <td>{expense.expense_title}</td>
-                <td>{expense.category_name}</td>
-                <td>{expense.expense_amount}</td>
-                <td>{expense.expense_date}</td>
-                <td>{expense.description || '-'}</td>
+                {editingId === expense.expense_id ? (
+                  <>
+                    <td>
+                      <input
+                        type="text"
+                        name="expense_title"
+                        value={editingExpense?.expense_title || ''}
+                        onChange={handleEditChange}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="category_name"
+                        value={editingExpense?.category_name || ''}
+                        onChange={handleEditChange}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        name="expense_amount"
+                        value={editingExpense?.expense_amount || ''}
+                        onChange={handleEditChange}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        name="expense_date"
+                        value={editingExpense?.expense_date || ''}
+                        onChange={handleEditChange}
+                      />
+                    </td>
+                    <td>
+                      <textarea
+                        name="description"
+                        value={editingExpense?.description || ''}
+                        onChange={handleEditChange}
+                      />
+                    </td>
+                    <td>
+                      <button onClick={handleSaveEdit}>Save</button>
+                      <button onClick={() => setEditingId(null)}>Cancel</button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td>{expense.expense_title}</td>
+                    <td>{expense.category_name}</td>
+                    <td>{expense.expense_amount}</td>
+                    <td>{expense.expense_date}</td>
+                    <td>{expense.description || '-'}</td>
+                    <td>
+                      <button onClick={() => handleEdit(expense)}>Edit</button>
+                      <button onClick={() => handleDelete(expense.expense_id)}>Delete</button>
+                    </td>
+                  </>
+                )}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5}>No expenses found</td>
+              <td colSpan={6}>No expenses found</td>
             </tr>
           )}
         </tbody>

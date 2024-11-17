@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../axiosInstance'
-import './styles/RegistrationPage.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/styles/RegistrationPage.css';
 
 const RegistrationPage: React.FC = () => {
   const [formData, setFormData] = useState({

@@ -204,4 +204,25 @@ export const setNewPassword = async(req, res)=>{
   }
 
 }
-export default {register, login, logout, verifyCode, deleteUser, setNewPassword};
+
+export const fetchBudgetCategories = async (req: Request, res: Response) => {
+  const query = 'SELECT * FROM Categorizes ';
+
+  try {
+      const result = await execute(query);
+
+      // Ensure that result.rows is defined
+      if (result.rows) {
+          const categories = result.rows.map((row: any) => row[0]); // Map rows to category names
+          res.status(200).json({ categories });  // Send categories back as a JSON response
+      } else {
+          res.status(404).json({ error: 'No categories found' });  // Handle case where rows are undefined or empty
+      }
+  } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ error: 'Error fetching categories' });  // Handle errors
+  }
+};
+
+
+export default {register, login, logout, verifyCode, deleteUser, setNewPassword, fetchBudgetCategories};

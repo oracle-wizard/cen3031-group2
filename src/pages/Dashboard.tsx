@@ -1,8 +1,7 @@
 // Dashboard.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './styles/Dashboard.css';
+import '@/styles/Dashboard.css';
 import api from '../axiosInstance';
 import LogoutButton from './Logout';
 

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../axiosInstance'
-import './styles/LoginPage.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/styles/LoginPage.css';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');

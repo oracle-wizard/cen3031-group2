@@ -12,14 +12,17 @@ router.post('/login',  login);
 router.post('/refresh-token',  refreshToken)
 router.post('/dashboard', authToken,  addBudget ) ;
 router.get('/dashboard', authToken ) ;
-router.get('/expenseTracker', authToken, getExpenses);
+router.get('/expense-tracker', getExpenses);
+<<<<<<< Updated upstream
 router.post('/expenses', authToken, addExpense);
 router.put('/expenses', authToken, updateExpense);
 router.delete('/expenses', authToken, deleteExpense);
+=======
+>>>>>>> Stashed changes
 router.post('/reset-password', resetPassword);
 router.post('/logout', logout);
 router.post('/verify-code', verifyCode);
-router.post('/delete', deleteUser);
+router.delete('/delete', deleteUser);
 router.post('/new-password', setNewPassword)
 //router.get('/expenses', getExpenses);
 //router.post('/expenses', addExpense);

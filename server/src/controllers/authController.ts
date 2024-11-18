@@ -62,6 +62,14 @@ export const login = async(req, res) =>{
         return res.status(401).json({error: 'Invalid password'});
       }
       const {accessToken, refreshToken} = generateToken(res, email);
+      res.cookie('accessToken', accessToken, {
+        httpOnly: false,
+        secure: false,  
+        sameSite: 'Lax',
+        domain: 'localhost',
+        path: '/',
+        maxAge: 1 * 60 * 1000, // 1 minute for demo purposes
+    });
       console.log(`refreshToken ${refreshToken}`)
       res.cookie('refreshToken', refreshToken, 
         {
@@ -86,7 +94,7 @@ export const logout  = async(req: Request, res: Response) =>{
       path: '/', 
       domain: 'localhost', 
       sameSite: 'lax', 
-      secure: false //need to change later
+      secure: false 
     })
     res.sendStatus(200);
 }

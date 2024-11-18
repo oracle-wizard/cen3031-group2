@@ -37,7 +37,7 @@ api.interceptors.response.use((response) => {
     console.log(` error.reponse.status = ${error.response.status}`)
     console.log(document.cookie)
     const originalRequest = error.config;
-    if (error.response.status === 403 && !originalRequest._retry) {
+    if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try{const response = await api.post('/refresh-token', {
         withCredentials: true
@@ -49,7 +49,7 @@ api.interceptors.response.use((response) => {
       return api(originalRequest);
       }
       catch(err){
-        window.location.href = "http://localhost:3000/login"
+        window.location.href = "http://localhost:5173/login"
         return Promise.reject(error);}
     }});
 

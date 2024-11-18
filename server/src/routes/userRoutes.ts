@@ -12,18 +12,13 @@ router.post('/login',  login);
 router.post('/refresh-token',  refreshToken)
 router.post('/dashboard', authToken,  addBudget ) ;
 router.get('/dashboard', authToken ) ;
-router.get('/expense-tracker', getExpenses);
-<<<<<<< Updated upstream
-router.post('/expenses', authToken, addExpense);
-router.put('/expenses', authToken, updateExpense);
-router.delete('/expenses', authToken, deleteExpense);
-=======
->>>>>>> Stashed changes
+router.get('/get-expenses', authToken, getExpenses);
+router.post('/add-expenses', authToken, addExpense);
+router.put('/update-expenses', authToken, updateExpense);
+router.delete('/delete-expenses', authToken, deleteExpense);
 router.post('/reset-password', resetPassword);
 router.post('/logout', logout);
 router.post('/verify-code', verifyCode);
 router.delete('/delete', deleteUser);
 router.post('/new-password', setNewPassword)
-//router.get('/expenses', getExpenses);
-//router.post('/expenses', addExpense);
 export default router;

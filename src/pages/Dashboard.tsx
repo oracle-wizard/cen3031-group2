@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
     };
 
     const handleExpenseTrackerClick = () => {
-        navigate('/expenseTracker');
+        navigate('/expense-tracker');
     };
 
     return (

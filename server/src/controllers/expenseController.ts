@@ -4,6 +4,7 @@ import { execute } from '../database';
 export const getExpenses = async (req: Request, res: Response) => {
   try {
       // Extract only the email from req.user
+      console.log('req.user:', req.user); // Should log { email: "user@example.com" }
       const userEmail = req.user?.email;
       if (!userEmail) {
           throw new Error("User email not found in request");
@@ -114,6 +115,7 @@ export const updateExpense = async (req: Request, res: Response) => {
       res.status(500).json({ error: 'Failed to update expense' });
   }
 };
+
 export const deleteExpense = async (req: Request, res: Response) => {
   try {
       const { expense_id } = req.body;

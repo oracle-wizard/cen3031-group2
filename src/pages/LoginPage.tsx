@@ -11,31 +11,22 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add form submission logic here
-    console.log("Form submitted with email:", email, "and password:", password);
-    try{
-      const response = await api.post('/login', {email, password});
+    try {
+      const response = await api.post('/login', { email, password });
 
-      if(response.status!==200){
-        const errorData = await response.data;
-        setErrorMessage('Login failed')
-        throw new Error(errorData.error || 'Login failed')
+      const { accessToken } = response.data;
+      localStorage.setItem('accessToken', accessToken); // Store accessToken
+      console.log('Access Token stored successfully.');
+      navigate('/dashboard'); // Redirect to the dashboard
+  } catch (error) {
+      if (error.response?.status === 401) {
+          setErrorMessage('Invalid credentials.');
+      } else {
+          setErrorMessage('An error occurred during login.');
       }
-      const {accessToken } =  response.data;
-      console.log('obtained accessToken upon login')
-      localStorage.setItem('accessToken', accessToken);
-      console.log(localStorage.getItem('accessToken'))
-      navigate('/dashboard');
-    }
-    catch(error){
-      if (error.response && error.response.status === 401) {
-        setErrorMessage("Unauthorized: Please check your credentials or register."); // Optional: redirect to login if not already there
-    } else {
-        setErrorMessage('Login failed.');
-        console.error('Error:', error);
-    }
-    }
-  };
+      console.error('Error:', error);
+  }
+};
 
     // Function to navigate to the registration page
     const goToRegister = () => {

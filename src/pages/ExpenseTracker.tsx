@@ -307,17 +307,26 @@ const ExpenseTracker: React.FC = () => {
                 </td>
                 <td>
                   {editingExpenseId === row.expense_id ? (
-                    <button onClick={() => handleSave(row)}>
+                    <button
+                      onClick={() => handleSave(row)}
+                      className="tw-text-green-500 tw-border tw-border-transparent tw-p-1 tw-rounded tw-transition tw-duration-300 tw-ease-in-out hover:tw-border-green-500 hover:tw-text-green-700"
+                    >
                       <FaSave />
                     </button>
                   ) : (
-                    <button onClick={() => handleEdit(row.expense_id)}>
+                    <button
+                      onClick={() => handleEdit(row.expense_id)}
+                      className="tw-text-blue-500 tw-border tw-border-transparent tw-p-1 tw-rounded tw-transition tw-duration-300 tw-ease-in-out hover:tw-border-blue-500 hover:tw-text-blue-700"
+                    >
                       <FaEdit />
                     </button>
                   )}
                 </td>
                 <td>
-                  <button onClick={() => handleDelete(row.expense_id)}>
+                  <button
+                    onClick={() => handleDelete(row.expense_id)}
+                    className="tw-text-red-500 tw-border tw-border-transparent tw-p-1 tw-rounded tw-transition tw-duration-300 tw-ease-in-out hover:tw-border-red-500 hover:tw-text-red-700"
+                  >
                     <FaTrashAlt />
                   </button>
                 </td>

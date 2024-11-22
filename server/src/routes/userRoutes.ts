@@ -4,6 +4,12 @@ import { refreshToken } from '../controllers/refreshTokenController';
 import {addBudget} from '../controllers/dashboard'
 import authToken from '../middleware/authenticateToken';
 import { getExpenses, addExpense, updateExpense, deleteExpense } from '../controllers/expenseController';
+import {
+    getBudgetCategories,
+    addBudgetCategory,
+    updateBudgetCategory,
+    deleteBudgetCategory,
+} from '../controllers/budgetController'
 
 
 const router = Router();
@@ -21,4 +27,8 @@ router.post('/logout', logout);
 router.post('/verify-code', verifyCode);
 router.delete('/delete', deleteUser);
 router.post('/new-password', setNewPassword)
+router.get('/get-budget-categories', authToken, getBudgetCategories);
+router.post('/add-budget-category', authToken, addBudgetCategory);
+router.put('/update-budget-category', authToken, updateBudgetCategory);
+router.delete('/delete-budget-category', authToken, deleteBudgetCategory);
 export default router;

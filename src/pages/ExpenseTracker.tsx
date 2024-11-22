@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt, FaSave } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import api from '../axiosInstance';
 
 interface Expense {
@@ -25,8 +26,17 @@ const ExpenseTracker: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [sortBy, setSortBy] = useState('date'); // Sorting state
   const [editingExpenseId, setEditingExpenseId] = useState<number | null>(null); // Track the currently edited expense
+  const navigate = useNavigate();
+  
 
   const categories = ['Food', 'Transport', 'Utilities', 'Entertainment'];
+
+  useEffect(() => {
+    const isAuth = localStorage.getItem("accessToken");
+    if (!isAuth) {
+        navigate('/login');
+    }
+}, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

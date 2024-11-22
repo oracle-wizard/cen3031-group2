@@ -25,13 +25,10 @@ const BudgetCategory: React.FC = () => {
     const fetchCategories = async () => {
         try {
             const response = await api.get('/get-budget-categories');
-            console.log("API Response:", response.data); // Debug log
-            // Map the array of arrays into an array of objects
             const mappedCategories = response.data.map((item: any) => ({
                 name: item[0], // First element is the category name
                 amount: item[1], // Second element is the allocated amount
             }));
-            console.log("Mapped Categories:", mappedCategories); // Debug log
             setCategories(mappedCategories); // Update state
         } catch (error) {
             console.error("Error fetching budget categories:", error.response?.data || error.message);
@@ -145,6 +142,11 @@ const BudgetCategory: React.FC = () => {
                     />
                     <button onClick={handleAddCategory} className="add-button">
                         Add Category
+                    </button>
+                </div>
+                <div className="navigation-buttons">
+                    <button onClick={() => navigate('/dashboard')} className="back-button">
+                        Back to Dashboard
                     </button>
                 </div>
             </div>

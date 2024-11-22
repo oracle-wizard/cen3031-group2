@@ -27,9 +27,11 @@ const ExpenseTracker: React.FC = () => {
   const [sortBy, setSortBy] = useState('date'); // Sorting state
   const [editingExpenseId, setEditingExpenseId] = useState<number | null>(null); // Track the currently edited expense
   const navigate = useNavigate();
+  const [categories, setCategories] = useState<string[]>([]); // Categories from the backend
+
   
 
-  const categories = ['Food', 'Transport', 'Utilities', 'Entertainment'];
+
 
   useEffect(() => {
     const isAuth = localStorage.getItem("accessToken");
@@ -37,6 +39,19 @@ const ExpenseTracker: React.FC = () => {
         navigate('/login');
     }
 }, [navigate]);
+
+// Fetch budget categories from the backend
+const fetchCategories = async () => {
+  try {
+      const response = await api.get('/get-budget-categories');
+      console.log('Fetched Categories:', response.data);
+      const mappedCategories = response.data.map((item: any) => item[0]); // Extract just the category names
+      setCategories(mappedCategories); // Update categories state
+  } catch (error) {
+      console.error('Error fetching budget categories:', error.response?.data || error.message);
+  }
+};
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -125,8 +140,10 @@ const ExpenseTracker: React.FC = () => {
 
   
   useEffect(() => {
-    fetchExpenses();
-  }, []);
+    fetchCategories(); // Fetch categories when component mounts
+    fetchExpenses(); // Fetch expenses when component mounts
+}, []);
+
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
@@ -158,14 +175,15 @@ const ExpenseTracker: React.FC = () => {
             value={category_name}
             onChange={(e) => setCategory(e.target.value)}
             className="tw-col-span-2 tw-border tw-pl-4"
-          >
-            <option value="">Category</option>
+        >
+            <option value="">Select Category</option>
             {categories.map((cat, idx) => (
               <option key={idx} value={cat}>
                 {cat}
               </option>
-            ))}
+              ))}
           </select>
+
           <input
             type="number"
             className="tw-col-span-1 tw-border tw-pl-4"

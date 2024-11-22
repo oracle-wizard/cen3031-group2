@@ -7,6 +7,8 @@ import UpdateProfile from './pages/AccountUpdate';
 import Dashboard from './pages/Dashboard';
 import ResetPassword from './pages/ResetPasswordPage';
 import ExpenseTracker from './pages/ExpenseTracker.tsx';
+import BudgetCategory from './pages/BudgetCategory';
+
 
 const App: React.FC = () => {
   return (
@@ -19,6 +21,7 @@ const App: React.FC = () => {
         <Route path="/dashboard" element ={<Dashboard/>} />
         <Route path = "/reset-password" element = {<ResetPassword/>}/>
         <Route path="/expense-tracker" element={<ExpenseTracker />} /> 
+        <Route path="/budget-category" element={<BudgetCategory />} />
         </Routes>
     </Router>
   );

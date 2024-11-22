@@ -31,7 +31,7 @@ export const register = async ( req: Request, res: Response)  => {
       res.cookie('refreshToken', refreshToken, 
         {httpOnly:true, 
          sameSite: 'strict',
-         maxAge: 60*60*1000
+         maxAge: 60*60*1000*24
        }
      )     
      res.status(200).json({accessToken})
@@ -68,7 +68,7 @@ export const login = async(req, res) =>{
         sameSite: 'Lax',
         domain: 'localhost',
         path: '/',
-        maxAge: 1 * 60 * 1000, // 1 minute for demo purposes
+        maxAge: 24*60*60*1000, 
     });
       console.log(`refreshToken ${refreshToken}`)
       res.cookie('refreshToken', refreshToken, 
@@ -78,7 +78,7 @@ export const login = async(req, res) =>{
           sameSite:'Lax',
           domain: 'localhost',
           path: '/',
-          maxAge: 10*60*1000
+          maxAge: 24*60*60*1000
        }
     )      
     res.status(200).json({accessToken})
@@ -202,7 +202,7 @@ export const setNewPassword = async(req, res)=>{
       res.cookie('refreshToken', refreshToken, 
         {httpOnly:true, 
          sameSite: 'strict',
-         maxAge: 60*60*1000
+         maxAge: 60*60*1000*24
        }
      )      
      res.status(201).json({accessToken})

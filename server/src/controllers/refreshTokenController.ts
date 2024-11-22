@@ -14,7 +14,7 @@ export const refreshToken = async (req , res) =>{
       if(!user) {
         return res.status(401).json({error: "Invalid refresh token"})
       }
-      const accessToken = jwt.sign({email: user}, process.env.JWT_SECRET as string, {'expiresIn': '5m'});
+      const accessToken = jwt.sign({email: user}, process.env.JWT_SECRET as string, {'expiresIn': '10m'});
       console.log(`New token has been generated ${accessToken}`)
       res.json({token: accessToken})
     }

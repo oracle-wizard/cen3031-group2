@@ -4,6 +4,7 @@ import { execute } from '../database';
 import { generateToken } from "./generateToken";
 import * as bcrypt from 'bcrypt'
 import generateAndSend from "../middleware/sendEmail";
+import { addBudgetCategory } from './budgetController';
 
 import { refreshToken } from "./refreshTokenController";
 
@@ -15,32 +16,59 @@ interface User{
   password: string
 }
 
-export const register = async ( req: Request, res: Response)  => {
-    const { firstName, lastName, email, password } = req.body;
+export const register = async (req: Request, res: Response) => {
+  const { firstName, lastName, email, password } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    const query = `
+  const query = `
       INSERT INTO "C.SMELTZER".USERS (first_name, last_name, email, password)
       VALUES (:firstName, :lastName, :email, :hashedPassword)`;
-  
-    try {
+
+  try {
+      // Step 1: Register the user
       await execute(query, { firstName, lastName, email, hashedPassword });
-      const {accessToken, refreshToken} = generateToken(res, email);
-      console.log(`refresh token ${refreshToken}`)
-      res.cookie('refreshToken', refreshToken, 
-        {httpOnly:true, 
-         sameSite: 'strict',
-         maxAge: 60*60*1000
-       }
-     )     
-     res.status(200).json({accessToken})
-    } 
-    catch (error) {
+
+      // Step 2: Automatically create default budgets
+      const budgets = [
+          { category_name: 'Transportation', allocated_amount: 0 },
+          { category_name: 'Food', allocated_amount: 0 },
+          { category_name: 'Entertainment', allocated_amount: 0 },
+          { category_name: 'Housing and Utilities', allocated_amount: 0 },
+      ];
+
+      // Call addBudgetCategory for each budget
+      for (const budget of budgets) {
+          const reqForBudget = {
+              user: { email }, // Mock the `req.user` object
+              body: {
+                  category_name: budget.category_name,
+                  allocated_amount: budget.allocated_amount,
+              },
+          } as Request;
+
+          const resForBudget = {
+              status: () => ({ json: () => {} }), // Mock the `res` object
+          } as unknown as Response;
+
+          await addBudgetCategory(reqForBudget, resForBudget);
+      }
+
+      // Step 3: Generate tokens and set cookies
+      const { accessToken, refreshToken } = generateToken(res, email);
+      console.log(`refresh token ${refreshToken}`);
+      res.cookie('refreshToken', refreshToken, {
+          httpOnly: true,
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 1000,
+      });
+
+      res.status(200).json({ accessToken });
+  } catch (error) {
       console.error('Error during registration:', error);
       res.status(500).json({ error: 'Registration failed' });
-    }
-  };
+  }
+};
 
 export const login = async(req, res) =>{
     const {email, password} = req.body;

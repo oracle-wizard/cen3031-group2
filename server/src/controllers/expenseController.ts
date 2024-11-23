@@ -118,9 +118,18 @@ export const addExpense = async (req: Request, res: Response): Promise<void> => 
 // Update an existing expense
 export const updateExpense = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { expense_id, expense_title, category_name, expense_amount, expense_date, description } = req.body;
+        const {
+            expense_id,
+            expense_title,
+            category_name,
+            expense_amount,
+            expense_date,
+            description,
+        } = req.body;
+
         const userEmail = req.user?.email;
 
+        // Fetch the category ID for the provided category name and email
         const categoryQuery = `
             SELECT "CATEGORY_ID"
             FROM "C.SMELTZER"."BUDGETCATEGORY"
@@ -141,26 +150,51 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
 
         const categoryId = categoryResult.rows[0][0]; // Access CATEGORY_ID directly from the first row
 
-        const query = `
+        // Validate and format the expense_date
+        let formattedDate: string | undefined = undefined;
+
+        if (expense_date && expense_date.trim() !== '') {
+            // Ensure date is in YYYY-MM-DD format
+            const parsedDate = new Date(expense_date);
+            if (!isNaN(parsedDate.getTime())) {
+                formattedDate = parsedDate.toISOString().split('T')[0];
+            } else {
+                res.status(400).json({ error: 'Invalid expense_date format' });
+                return;
+            }
+        }
+
+        // Construct the SQL query and bindings
+        let updateQuery = `
             UPDATE "C.SMELTZER"."EXPENSE"
             SET 
                 "EXPENSE_TITLE" = :EXPENSE_TITLE,
                 "CATEGORY_ID" = :CATEGORY_ID,
                 "EXPENSE_AMOUNT" = :EXPENSE_AMOUNT,
-                "EXPENSE_DATE" = TO_DATE(:EXPENSE_DATE, 'YYYY-MM-DD'),
                 "DESCRIPTION" = :DESCRIPTION
-            WHERE "EXPENSE_ID" = :EXPENSE_ID
         `;
-        const binds = {
+
+        const binds: Record<string, any> = {
             EXPENSE_ID: expense_id,
             EXPENSE_TITLE: expense_title,
             CATEGORY_ID: categoryId,
             EXPENSE_AMOUNT: expense_amount,
-            EXPENSE_DATE: expense_date,
             DESCRIPTION: description || null,
         };
 
-        await execute(query, binds);
+        if (formattedDate) {
+            updateQuery += `,
+                "EXPENSE_DATE" = TO_DATE(:EXPENSE_DATE, 'YYYY-MM-DD')
+            `;
+            binds.EXPENSE_DATE = formattedDate;
+        }
+
+        updateQuery += ` WHERE "EXPENSE_ID" = :EXPENSE_ID`;
+
+        console.log("Executing query:", updateQuery); // Debug query
+        console.log("With binds:", binds); // Debug binds
+
+        await execute(updateQuery, binds);
 
         res.status(200).json({ message: 'Expense updated successfully' });
     } catch (error) {
@@ -168,6 +202,10 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
         res.status(500).json({ error: 'Failed to update expense' });
     }
 };
+
+
+
+
 
 // Delete an expense
 export const deleteExpense = async (req: Request, res: Response): Promise<void> => {

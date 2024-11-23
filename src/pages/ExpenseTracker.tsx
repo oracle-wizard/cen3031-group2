@@ -104,14 +104,29 @@ const ExpenseTracker: React.FC = () => {
     };
 
     const handleSave = async (expense: Expense) => {
-        try {
-            await api.put('/update-expenses', expense);
-            setEditingExpenseId(null); // Exit editing mode
-            fetchExpenses(); // Refresh the table
-        } catch (error) {
-            console.error('Error saving expense:', error);
-        }
-    };
+      try {
+          const formattedDate = expense.expense_date
+              ? new Date(expense.expense_date).toISOString().split('T')[0] // Convert to YYYY-MM-DD
+              : '';
+  
+          const payload = formattedDate
+              ? { ...expense, expense_date: formattedDate }
+              : { ...expense, expense_date: undefined }; // Remove expense_date if empty
+  
+          console.log("Sending payload to backend:", payload);
+  
+          await api.put('/update-expenses', payload);
+          setEditingExpenseId(null); // Exit editing mode
+          fetchExpenses(); // Refresh the table
+      } catch (error) {
+          console.error('Error saving expense:', error);
+      }
+  };
+  
+  
+  
+  
+  
 
     const handleDelete = async (expenseId: number) => {
         try {

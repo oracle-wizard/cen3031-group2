@@ -27,6 +27,13 @@ const ExpenseTracker: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const isAuth = localStorage.getItem("accessToken");
+        if (!isAuth) {
+            navigate('/login');
+        }
+    }, [navigate]);
+
+    useEffect(() => {
         fetchCategories();
         fetchExpenses();
     }, []);

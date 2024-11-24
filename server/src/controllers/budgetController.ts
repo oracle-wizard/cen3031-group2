@@ -77,18 +77,20 @@ export const addBudgetCategory = async (req: Request, res: Response) => {
 // Update a budget category
 export const updateBudgetCategory = async (req: Request, res: Response) => {
     try {
-        const { category_name, allocated_amount } = req.body;
+        const { category_name, allocated_amount, new_category_name } = req.body;
 
         const query = `
             UPDATE "C.SMELTZER"."BUDGETCATEGORY"
             SET 
-                "ALLOCATED_AMOUNT" = :ALLOCATED_AMOUNT
+                "ALLOCATED_AMOUNT" = :ALLOCATED_AMOUNT,
+                "CATEGORY_NAME" = :NEW_CATEGORY_NAME
             WHERE "CATEGORY_NAME" = :CATEGORY_NAME
               AND LOWER("EMAIL") = LOWER(:EMAIL)
         `;
 
         const binds = {
             CATEGORY_NAME: category_name,
+            NEW_CATEGORY_NAME: new_category_name || category_name, // Keep the old name if no new name is provided
             ALLOCATED_AMOUNT: allocated_amount,
             EMAIL: req.user?.email
         };
@@ -101,6 +103,7 @@ export const updateBudgetCategory = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Failed to update budget category' });
     }
 };
+
 
 // Delete a budget category
 export const deleteBudgetCategory = async (req: Request, res: Response) => {

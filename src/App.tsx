@@ -6,23 +6,25 @@ import LoginPage from './pages/LoginPage';
 import UpdateProfile from './pages/AccountUpdate';
 import Dashboard from './pages/Dashboard';
 import ResetPassword from './pages/ResetPasswordPage';
-import ExpenseTracker from './pages/ExpenseTracker.tsx';
+import ExpenseTracker from './pages/ExpenseTracker';
 import BudgetCategory from './pages/BudgetCategory';
-
+import InactivityHandler from './components/InactivityHandler'; // Import the InactivityHandler
 
 const App: React.FC = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<RegistrationPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/update-profile" element={<UpdateProfile />} />
-        <Route path="/dashboard" element ={<Dashboard/>} />
-        <Route path = "/reset-password" element = {<ResetPassword/>}/>
-        <Route path="/expense-tracker" element={<ExpenseTracker />} /> 
-        <Route path="/budget-category" element={<BudgetCategory />} />
+      <InactivityHandler>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<RegistrationPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/update-profile" element={<UpdateProfile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/expense-tracker" element={<ExpenseTracker />} /> 
+          <Route path="/budget-category" element={<BudgetCategory />} />
         </Routes>
+      </InactivityHandler>
     </Router>
   );
 };

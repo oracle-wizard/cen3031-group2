@@ -242,7 +242,7 @@ export const setNewPassword = async(req, res)=>{
 }
 
 export const fetchBudgetCategories = async (req: Request, res: Response) => {
-  const query = 'SELECT * FROM Categorizes ';
+  const query = 'SELECT * FROM "C.SMELTZER".Categorizes ';
 
   try {
       const result = await execute(query);

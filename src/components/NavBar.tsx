@@ -1,83 +1,50 @@
-function NavBar() {
-  return (
-    <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <a className="navbar-brand" href="#">
-          Navbar
-        </a>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../server/src/context/authContext'
+import LogoutButton from '../pages/Logout';
 
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <a className="nav-link" href="#">
-                Home <span className="sr-only">(current)</span>
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">
-                Link
-              </a>
-            </li>
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                Dropdown
-              </a>
-              <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a className="dropdown-item" href="#">
-                  Action
-                </a>
-                <a className="dropdown-item" href="#">
-                  Another action
-                </a>
-                <div className="dropdown-divider"></div>
-                <a className="dropdown-item" href="#">
-                  Something else here
-                </a>
-              </div>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link disabled" href="#">
-                Disabled
-              </a>
-            </li>
-          </ul>
-          <form className="form-inline my-2 my-lg-0">
-            <input
-              className="form-control mr-sm-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button
-              className="btn btn-outline-success my-2 my-sm-0"
-              type="submit"
-            >
-              Search
-            </button>
-          </form>
+const Navbar: React.FC = () => {
+  const { email, logout } = useAuth(); // Get email and logout function from context
+  const [loading, setLoading] = useState<boolean>(true);  // Add loading state
+  const navigate = useNavigate();
+
+    useEffect(() => {
+    setLoading(false);
+  }, []);  // Empty dependency array to run only once when the component mounts
+
+
+    const handleLogout = () => {
+      // Remove the token from localStorage to log the user out
+      localStorage.removeItem("accessToken");
+      navigate('/login');
+    };
+
+    // Don't show the Navbar on the login page
+    if (location.pathname === '/login') 
+      return null;
+    else if (location.pathname === '/register')
+      return null;
+    else if (location.pathname === '/')
+      return null;
+
+    if (loading) {
+      return <div>Loading...</div>;  // Display loading message or spinner while checking for login status
+    }
+    return (
+      <nav className="tw-fixed tw-top-0 tw-left-0 tw-w-full tw-flex tw-justify-between tw-items-center tw-py-4 tw-px-8 tw-bg-gray-100 tw-border-b tw-border-gray-300 tw-z-50">
+        <div className="tw-text-2xl tw-font-bold tw-text-gray-800">Navbar</div>
+        <div className="tw-flex tw-items-center tw-space-x-4">
+          {email ? (
+            <>
+              <span className="tw-text-lg tw-text-gray-600">Welcome, {email}</span>
+              <LogoutButton/>
+            </>
+          ) : (
+            <span className="tw-text-lg tw-text-gray-600">Please log in</span>
+          )}
         </div>
       </nav>
-    </>
-  );
-}
+    );
+  };
 
-export default NavBar;
+export default Navbar;

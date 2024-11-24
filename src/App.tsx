@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import ResetPassword from './pages/ResetPasswordPage';
 import ExpenseTracker from './pages/ExpenseTracker';
 import BudgetCategory from './pages/BudgetCategory';
+import UserIncome from './pages/UserIncome';
 import InactivityHandler from './components/InactivityHandler'; // Import the InactivityHandler
 
 const App: React.FC = () => {
@@ -23,6 +24,7 @@ const App: React.FC = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/expense-tracker" element={<ExpenseTracker />} /> 
           <Route path="/budget-category" element={<BudgetCategory />} />
+          <Route path="/user-income" element={<UserIncome />} />
         </Routes>
       </InactivityHandler>
     </Router>

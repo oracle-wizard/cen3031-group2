@@ -4,6 +4,7 @@ const cors = require('cors');
 import userRoutes from './routes/userRoutes';
 import { closePool, initialize } from './database';
 import * as cookieParser from 'cookie-parser';
+import authToken from './middleware/authenticateToken';
 
 const app = express();
 

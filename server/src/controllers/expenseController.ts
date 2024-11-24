@@ -1,25 +1,44 @@
 import { Request, Response } from 'express';
 import { execute } from '../database';
 
-// Define types for query results
-interface CategoryRow {
-    CATEGORY_ID: number;
-}
+// Function to update TOTAL_SPENT for a specific user
+export const updateTotalSpend = async (req: Request, res: Response): Promise<void> => {
+    console.log("in update total spend")
+    try {
+    const query = `
+        UPDATE "C.SMELTZER"."BUDGETCATEGORY"
+        SET "TOTAL_SPENT" = (
+            SELECT SUM("EXPENSE_AMOUNT")
+            FROM "C.SMELTZER"."EXPENSE"
+            WHERE "C.SMELTZER"."EXPENSE"."CATEGORY_ID" = "C.SMELTZER"."BUDGETCATEGORY"."CATEGORY_ID"
+              AND LOWER("C.SMELTZER"."EXPENSE"."EMAIL") = LOWER(:EMAIL)
+        )
+        WHERE LOWER("EMAIL") = LOWER(:EMAIL)
+    `;
+    console.log("the query", query)
+    const binds = { EMAIL: req.user?.email };
+    console.log("the binds", binds)
+    
+    const result = await execute(query, binds);
+    console.log("the result", result)
 
-interface ExpenseRow {
-    EXPENSE_ID: number;
-    EXPENSE_TITLE: string;
-    CATEGORY_NAME: string;
-    EXPENSE_AMOUNT: number;
-    EXPENSE_DATE: Date;
-    DESCRIPTION: string | null;
-    EMAIL: string;
-}
+    // Check if any rows were affected
+    if (result.rowsAffected === 0) {
+        res.status(404).json({ error: 'No matching categories or expenses found for the given user.' });
+        return;
+    }
+        res.status(200).json({ message: 'TOTAL_SPENT updated successfully.' });
+    } catch (error) {
+        console.error('Error updating TOTAL_SPENT:', error);
+        res.status(500).json({ error: 'Failed to update TOTAL_SPENT.' });
+    }
+};
 
 // Fetch all expenses for the logged-in user
 export const getExpenses = async (req: Request, res: Response): Promise<void> => {
     try {
         const userEmail = req.user?.email;
+
         if (!userEmail) {
             throw new Error("User email not found in request");
         }
@@ -58,6 +77,10 @@ export const getExpenses = async (req: Request, res: Response): Promise<void> =>
 export const addExpense = async (req: Request, res: Response): Promise<void> => {
     try {
         const userEmail = req.user?.email;
+        if (!userEmail) {
+            res.status(400).json({ error: "User email is required." });
+            return;
+        }
         const { expense_title, category_name, expense_amount, expense_date, description } = req.body;
 
         const categoryQuery = `
@@ -107,7 +130,7 @@ export const addExpense = async (req: Request, res: Response): Promise<void> => 
         };
 
         await execute(query, binds);
-
+        
         res.status(200).json({ message: 'Expense added successfully' });
     } catch (error) {
         console.error('Error adding expense:', error);
@@ -128,6 +151,10 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
         } = req.body;
 
         const userEmail = req.user?.email;
+        if (!userEmail) {
+            res.status(400).json({ error: "User email is required." });
+            return;
+        }
 
         // Fetch the category ID for the provided category name and email
         const categoryQuery = `
@@ -136,6 +163,7 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
             WHERE LOWER("CATEGORY_NAME") = LOWER(:CATEGORY_NAME)
               AND LOWER("EMAIL") = LOWER(:EMAIL)
         `;
+        
         const categoryBinds = {
             CATEGORY_NAME: category_name,
             EMAIL: userEmail,
@@ -204,13 +232,16 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
 };
 
 
-
-
-
 // Delete an expense
 export const deleteExpense = async (req: Request, res: Response): Promise<void> => {
     try {
         const { expense_id } = req.body;
+
+        const userEmail = req.user?.email;
+        if (!userEmail) {
+            res.status(400).json({ error: "User email is required." });
+            return;
+        }
 
         const query = `
             DELETE FROM "C.SMELTZER"."EXPENSE"

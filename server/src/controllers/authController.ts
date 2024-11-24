@@ -21,15 +21,22 @@ export const register = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const query = `
+  const userQuery = `
       INSERT INTO "C.SMELTZER".USERS (first_name, last_name, email, password)
       VALUES (:firstName, :lastName, :email, :hashedPassword)`;
 
+  const incomeQuery = `
+      INSERT INTO "C.SMELTZER".MONEY (EMAIL, TOTAL_INCOME, MONEY_REMAINING)
+      VALUES (:email, 0, 0)`; // Default income set to 0
+
   try {
       // Step 1: Register the user
-      await execute(query, { firstName, lastName, email, hashedPassword });
+      await execute(userQuery, { firstName, lastName, email, hashedPassword });
 
-      // Step 2: Automatically create default budgets
+      // Step 2: Create default income for the user
+      await execute(incomeQuery, { email });
+
+      // Step 3: Automatically create default budgets
       const budgets = [
           { category_name: 'Transportation', allocated_amount: 0 },
           { category_name: 'Food', allocated_amount: 0 },
@@ -54,7 +61,7 @@ export const register = async (req: Request, res: Response) => {
           await addBudgetCategory(reqForBudget, resForBudget);
       }
 
-      // Step 3: Generate tokens and set cookies
+      // Step 4: Generate tokens and set cookies
       const { accessToken, refreshToken } = generateToken(res, email);
       console.log(`refresh token ${refreshToken}`);
       res.cookie('refreshToken', refreshToken, {
@@ -69,6 +76,7 @@ export const register = async (req: Request, res: Response) => {
       res.status(500).json({ error: 'Registration failed' });
   }
 };
+
 
 export const login = async(req, res) =>{
     const {email, password} = req.body;

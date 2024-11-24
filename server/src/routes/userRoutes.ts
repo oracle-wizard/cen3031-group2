@@ -4,6 +4,7 @@ import { refreshToken } from '../controllers/refreshTokenController';
 import {addBudget} from '../controllers/dashboard'
 import authToken from '../middleware/authenticateToken';
 import { getExpenses, addExpense, updateExpense, deleteExpense } from '../controllers/expenseController';
+import { getUserIncome, updateUserIncome } from '../controllers/userIncomeController';
 import {
     getBudgetCategories,
     addBudgetCategory,
@@ -31,4 +32,6 @@ router.get('/get-budget-categories', authToken, getBudgetCategories);
 router.post('/add-budget-category', authToken, addBudgetCategory);
 router.put('/update-budget-category', authToken, updateBudgetCategory);
 router.delete('/delete-budget-category', authToken, deleteBudgetCategory);
+router.get('/get-user-income', authToken, getUserIncome);
+router.put('/update-user-income', authToken, updateUserIncome);
 export default router;

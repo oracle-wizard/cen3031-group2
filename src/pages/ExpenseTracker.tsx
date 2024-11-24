@@ -78,16 +78,21 @@ const ExpenseTracker: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formattedDate = new Date(expense_date).toISOString().split('T')[0];
-
-        const newExpense = {
+    
+        // Create the new expense object
+        const newExpense: Record<string, any> = {
             expense_title,
             category_name,
             expense_amount,
             expense_date: formattedDate,
-            description,
             recurring,
         };
-
+    
+        // Only add description if it is not empty
+        if (description.trim()) {
+            newExpense.description = description;
+        }
+    
         try {
             await api.post('/add-expenses', newExpense);
             fetchExpenses(); // Refresh the expenses list
@@ -96,6 +101,7 @@ const ExpenseTracker: React.FC = () => {
             console.error('Error adding expense:', error);
         }
     };
+    
 
     const resetForm = () => {
         setTitle('');
@@ -204,8 +210,7 @@ const ExpenseTracker: React.FC = () => {
                         className="tw-col-span-2 tw-border tw-pl-4"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Description"
-                        required
+                        placeholder="Description (Optional)"
                     />
                     <input
                         type="date"
@@ -338,8 +343,10 @@ const ExpenseTracker: React.FC = () => {
                                                 )
                                             }
                                         />
-                                    ) : (
+                                    ) : row.description ?(
                                         row.description
+                                    ) : (
+                                        ''
                                     )}
                                 </td>
                                 <td>

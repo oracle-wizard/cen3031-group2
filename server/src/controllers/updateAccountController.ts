@@ -13,6 +13,7 @@ export const updateAccount = async (req: Request, res: Response) => {
               "EMAIL" = :NEW_EMAIL
           WHERE "EMAIL" = :OLD_EMAIL
       `;
+      
       const binds = {
           FIRST_NAME: firstName,
           LAST_NAME: lastName,

@@ -1,169 +1,450 @@
-// ExpenseTracker.tsx
-// import { useNavigate } from 'react-router-dom';
-// import api from '../axiosInstance';
-// import './styles/ExpenseTracker.css';
-import React, { useState, useEffect  } from 'react';
-import DateInputToday from '../components/DateInputToday';
-import RecentTransactionsTable from '../components/RecentTransactionsFakeDate'
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { FaEdit, FaTrashAlt, FaSave } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import api from '../axiosInstance';
 
 interface Expense {
+    expense_id: number;
+    expense_date: string;
+    expense_title: string;
+    category_name: string;
     description: string;
-    category: string;
-    amount: string;
-    payee: string;
-    note: string;
-    date: string;
-    isRecurring: boolean;
-  }
-  
-const ExpenseTracker = () => {
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Non-recurring');
-  const [amount, setAmount] = useState('');
-  const [payee, setPayee] = useState('');
-  const [note, setNote] = useState('');
-  const [date, setDate] = useState('');
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+    expense_amount: number;
+    recurring: boolean;
+}
 
-  const categories = ['Food', 'Transport', 'Utilities', 'Entertainment'];
-  const recurringCategories  = ['Non-recurring', 'Recurring'];
+const ExpenseTracker: React.FC = () => {
+    const [expense_title, setTitle] = useState('');
+    const [category_name, setCategory] = useState('');
+    const [expense_amount, setAmount] = useState<number>(0);
+    const [expense_date, setDate] = useState('');
+    const [description, setDescription] = useState('');
+    const [recurring, setRecurring] = useState(false);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [sortBy, setSortBy] = useState('date');
+    const [editingExpenseId, setEditingExpenseId] = useState<number | null>(null);
+    const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    useEffect(() => {
+        const isAuth = localStorage.getItem("accessToken");
+        if (!isAuth) {
+            navigate('/login');
+        }
+    }, [navigate]);
 
-    const newExpense = {
-      description,
-      category,
-      amount,
-      payee,
-      note,
-      date,
-      isRecurring,
+    useEffect(() => {
+        fetchCategories();
+        fetchExpenses();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await api.get('/get-budget-categories');
+            const mappedCategories = response.data.map((item: any) => item[0]);
+            setCategories(mappedCategories);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
     };
 
-    setExpenses([...expenses, newExpense]);
+    const fetchExpenses = async () => {
+        try {
+            const response = await api.get('/get-expenses');
+            const mappedData = response.data.map((expense: any) => ({
+                expense_id: expense[0],
+                expense_title: expense[1],
+                category_name: expense[2],
+                expense_amount: expense[3],
+                expense_date: formatDate(expense[4]),
+                description: expense[5],
+                recurring: expense[6] || false,
+            }));
+            setExpenses(mappedData);
+        } catch (error) {
+            console.error('Error fetching expenses:', error);
+        }
+    };
+    
+    const updateTotalSpend = async () => {
+        try {
+            console.log('Total spent being updated:');
+              console.log(api)
+            const response = await api.put('/update-total-spend');
+            console.log('Total spent updated:', response.data);
+        } catch (error: any) {
+            if (error.response) {
+                // Server responded with a status other than 2xx
+                console.error('Error response:', error.response);
+                console.error('Status:', error.response.status);
+                console.error('Data:', error.response.data);
+            } else if (error.request) {
+                // Request was made but no response was received
+                console.error('Error request:', error.request);
+            } else {
+                // Something else happened in setting up the request
+                console.error('Error message:', error.message);
+                console.error('Error object:', error); 
+            }
+        }
+    };
+    
+    const formatDate = (dateString: string) => {
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+        };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    };
 
-    // Reset form fields
-    setDescription('');
-    setCategory('');
-    setAmount('');
-    setPayee('');
-    setNote('');
-    setDate('');
-    setIsRecurring(false);
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formattedDate = new Date(expense_date).toISOString().split('T')[0];
+    
+        // Create the new expense object
+        const newExpense: Record<string, any> = {
+            expense_title,
+            category_name,
+            expense_amount,
+            expense_date: formattedDate,
+            recurring,
+        };
+    
+        // Only add description if it is not empty
+        if (description.trim()) {
+            newExpense.description = description;
+        }
+    
+        try {
+            await api.post('/add-expenses', newExpense);
+            updateTotalSpend();
+            fetchExpenses(); // Refresh the expenses list
+            resetForm();
+        } catch (error) {
+            console.error('Error adding expense:', error);
+        }
+    };
+    
+
+    const resetForm = () => {
+        setTitle('');
+        setCategory('');
+        setAmount(0);
+        setDate('');
+        setDescription('');
+        setRecurring(false);
+    };
+
+    const handleEdit = (expenseId: number) => {
+        setEditingExpenseId(expenseId);
+    };
+
+    const handleSave = async (expense: Expense) => {
+      try {
+          const formattedDate = expense.expense_date
+              ? new Date(expense.expense_date).toISOString().split('T')[0] // Convert to YYYY-MM-DD
+              : '';
+  
+          const payload = formattedDate
+              ? { ...expense, expense_date: formattedDate }
+              : { ...expense, expense_date: undefined }; // Remove expense_date if empty
+  
+          console.log("Sending payload to backend:", payload);
+  
+          await api.put('/update-expenses', payload);
+          setEditingExpenseId(null); // Exit editing mode
+          updateTotalSpend();
+          fetchExpenses(); // Refresh the table
+      } catch (error) {
+          console.error('Error saving expense:', error);
+      }
   };
+  
+    const handleDelete = async (expenseId: number) => {
+        try {
+            await api.delete('/delete-expenses', { data: { expense_id: expenseId } });
+            updateTotalSpend();
+            fetchExpenses(); // Refresh the expenses list
+        } catch (error) {
+            console.error('Error deleting expense:', error);
+        }
+    };
 
-  const handleDelete = (index : number) => {
-    const updatedExpenses = expenses.filter((_, idx) => idx !== index);
-    setExpenses(updatedExpenses);
-  };
+    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSortBy(e.target.value);
+    };
 
-  const handleEdit = (index : number) => {
-    const expenseToEdit = expenses[index];
-    setDescription(expenseToEdit.description);
-    setCategory(expenseToEdit.category);
-    setAmount(expenseToEdit.amount);
-    setPayee(expenseToEdit.payee);
-    setNote(expenseToEdit.note);
-    setDate(expenseToEdit.date);
-    setIsRecurring(expenseToEdit.isRecurring);
-    handleDelete(index); // Remove expense from list after editing
-  };
+    const sortedData = [...expenses].sort((a, b) => {
+        if (sortBy === 'date') {
+            return new Date(a.expense_date).getTime() - new Date(b.expense_date).getTime();
+        } else if (sortBy === 'amount') {
+            return a.expense_amount - b.expense_amount;
+        }
+        return 0;
+    });
 
-  return (
-    <div className='text-start'>
-        
-      <p className='tw-mb-4 tw-text-green-800'>NEW TRANSACTION</p>
-      <form onSubmit={handleSubmit}>
-        <div className='tw-grid tw-grid-cols-8 tw-grid-rows-2 tw-gap-4'>
-            <input
-                type="text"
-                className='tw-col-span-4 tw-border tw-pl-4'
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-                placeholder='Add a description'
-            />
-
-            <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required   
-                className='tw-col-span-2 tw-border tw-pl-4'             
-            >
-                <option value="">Category</option>
-                {categories.map((cat, idx) => (
-                <option key={idx} value={cat}>
-                    {cat}
-                </option>
-                ))}
-            </select>
-
-            <div className='tw-flex'>
-            <input
-                type="number"
-                className='tw-col-span-1 tw-border'
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-            />
-            
-            <div className='tw-border-r tw-border-b tw-border-t tw-p-4 tw-self-center'>USD</div>
+    return (
+        <div className="text-start">
+            <div className="tw-flex tw-justify-between tw-items-center tw-mb-4">
+                <h2 className="tw-text-green-800">Expense Tracker</h2>
+                <button
+                    onClick={() => navigate('/dashboard')}
+                    className="tw-bg-blue-500 tw-text-white tw-py-2 tw-px-4 tw-rounded tw-transition hover:tw-bg-blue-700"
+                >
+                    Back to Dashboard
+                </button>
             </div>
 
-            <input
-                type="text"
-                className='tw-col-span-2 tw-row-start-2 tw-border tw-pl-4'
-                value={payee}
-                onChange={(e) => setPayee(e.target.value)}
-                placeholder='Payee'
-                required
-            />
-            <textarea
-                className='tw-col-span-2 tw-border tw-pl-4 tw-content-center'
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder='Notes'
-            />
-            <DateInputToday/>
+            <form onSubmit={handleSubmit}>
+                <div className="tw-grid tw-grid-cols-8 tw-gap-4">
+                    <input
+                        type="text"
+                        className="tw-col-span-2 tw-border tw-pl-4"
+                        value={expense_title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Expense Title"
+                        required
+                    />
+                    <select
+                        value={category_name}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="tw-col-span-2 tw-border tw-pl-4"
+                        required
+                    >
+                        <option value="">Select Category</option>
+                        {categories.map((cat, idx) => (
+                            <option key={idx} value={cat}>
+                                {cat}
+                            </option>
+                        ))}
+                    </select>
+                    <input
+                        type="number"
+                        className="tw-col-span-1 tw-border tw-pl-4"
+                        value={expense_amount}
+                        onChange={(e) => setAmount(Number(e.target.value))}
+                        placeholder="Amount"
+                        required
+                    />
+                    <textarea
+                        className="tw-col-span-2 tw-border tw-pl-4"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Description (Optional)"
+                    />
+                    <input
+                        type="date"
+                        className="tw-col-span-2 tw-border tw-pl-4"
+                        value={expense_date}
+                        onChange={(e) => setDate(e.target.value)}
+                        required
+                    />
+                    <label className="tw-flex items-center tw-col-span-1 tw-border">
+                        <input
+                            type="checkbox"
+                            checked={recurring}
+                            onChange={(e) => setRecurring(e.target.checked)}
+                            className="tw-mr-2"
+                        />
+                        Recurring
+                    </label>
+                    <button type="submit" className="tw-col-span-1 tw-bg-green-500 tw-text-white">
+                        Add Expense
+                    </button>
+                </div>
+            </form>
 
-            <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required   
-                className='tw-col-span-1 tw-border '             
-            >
-                {recurringCategories.map((cat, idx) => (
-                <option key={idx} value={cat}>
-                    {cat}
-                </option>
-                ))}
-            </select>
-            <button className='tw-col-start-7 tw-bg-green-500 tw-text-white tw-place-self-stretch tw-place-items-end' type="submit">Add Expense</button>
+            <h2 className="tw-mt-16 tw-text-green-800">Recent Transactions</h2>
+            <div>
+                <div className="tw-mb-4 tw-place-self-end">
+                    <label htmlFor="sort" className="tw-mr-2">
+                        Sort by:
+                    </label>
+                    <select
+                        id="sort"
+                        value={sortBy}
+                        onChange={handleSortChange}
+                        className="tw-border tw-p-2"
+                    >
+                        <option value="date">Date</option>
+                        <option value="amount">Amount</option>
+                    </select>
+                </div>
+                <table className="tw-min-w-full tw-table-auto tw-border-collapse">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Expense Title</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Recurring</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedData.map((row) => (
+                            <tr key={row.expense_id}>
+                                <td>
+                                    {editingExpenseId === row.expense_id ? (
+                                        <input
+                                            type="date"
+                                            value={row.expense_date}
+                                            onChange={(e) =>
+                                                setExpenses((prev) =>
+                                                    prev.map((exp) =>
+                                                        exp.expense_id === row.expense_id
+                                                            ? { ...exp, expense_date: e.target.value }
+                                                            : exp
+                                                    )
+                                                )
+                                            }
+                                        />
+                                    ) : (
+                                        row.expense_date
+                                    )}
+                                </td>
+                                <td>
+                                    {editingExpenseId === row.expense_id ? (
+                                        <input
+                                            type="text"
+                                            value={row.expense_title}
+                                            onChange={(e) =>
+                                                setExpenses((prev) =>
+                                                    prev.map((exp) =>
+                                                        exp.expense_id === row.expense_id
+                                                            ? { ...exp, expense_title: e.target.value }
+                                                            : exp
+                                                    )
+                                                )
+                                            }
+                                        />
+                                    ) : (
+                                        row.expense_title
+                                    )}
+                                </td>
+                                <td>
+                                    {editingExpenseId === row.expense_id ? (
+                                        <select
+                                            value={row.category_name}
+                                            onChange={(e) =>
+                                                setExpenses((prev) =>
+                                                    prev.map((exp) =>
+                                                        exp.expense_id === row.expense_id
+                                                            ? { ...exp, category_name: e.target.value }
+                                                            : exp
+                                                    )
+                                                )
+                                            }
+                                        >
+                                            {categories.map((cat, idx) => (
+                                                <option key={idx} value={cat}>
+                                                    {cat}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        row.category_name
+                                    )}
+                                </td>
+                                <td>
+                                    {editingExpenseId === row.expense_id ? (
+                                        <input
+                                            type="text"
+                                            value={row.description}
+                                            onChange={(e) =>
+                                                setExpenses((prev) =>
+                                                    prev.map((exp) =>
+                                                        exp.expense_id === row.expense_id
+                                                            ? { ...exp, description: e.target.value }
+                                                            : exp
+                                                    )
+                                                )
+                                            }
+                                        />
+                                    ) : row.description ?(
+                                        row.description
+                                    ) : (
+                                        ''
+                                    )}
+                                </td>
+                                <td>
+                                    {editingExpenseId === row.expense_id ? (
+                                        <input
+                                            type="number"
+                                            value={row.expense_amount}
+                                            onChange={(e) =>
+                                                setExpenses((prev) =>
+                                                    prev.map((exp) =>
+                                                        exp.expense_id === row.expense_id
+                                                            ? { ...exp, expense_amount: Number(e.target.value) }
+                                                            : exp
+                                                    )
+                                                )
+                                            }
+                                        />
+                                    ) : (
+                                        row.expense_amount
+                                    )}
+                                </td>
+                                <td>
+                                    {editingExpenseId === row.expense_id ? (
+                                        <input
+                                            type="checkbox"
+                                            checked={row.recurring}
+                                            onChange={(e) =>
+                                                setExpenses((prev) =>
+                                                    prev.map((exp) =>
+                                                        exp.expense_id === row.expense_id
+                                                            ? { ...exp, recurring: e.target.checked }
+                                                            : exp
+                                                    )
+                                                )
+                                            }
+                                        />
+                                    ) : (
+                                        row.recurring ? 'Yes' : 'No'
+                                    )}
+                                </td>
+                                <td>
+                                    {editingExpenseId === row.expense_id ? (
+                                        <button
+                                            onClick={() =>
+                                                handleSave(
+                                                    expenses.find((exp) => exp.expense_id === row.expense_id) as Expense
+                                                )
+                                            }
+                                            className="tw-text-green-500"
+                                        >
+                                            <FaSave />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleEdit(row.expense_id)}
+                                            className="tw-text-blue-500"
+                                        >
+                                            <FaEdit />
+                                        </button>
+                                    )}
+                                </td>
+                                <td>
+                                    <button
+                                        onClick={() => handleDelete(row.expense_id)}
+                                        className="tw-text-red-500"
+                                    >
+                                        <FaTrashAlt />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </form>
-
-      <h2 className='tw-mt-16 tw-text-green-800'>RECENT TRANSACTIONS</h2>
-      <RecentTransactionsTable/>
-      {/* <ul>
-        {expenses.map((expense, index) => (
-          <li key={index}>
-            <p>
-              <strong>{expense.description}</strong> - {expense.category} - ${expense.amount} - {expense.payee} - {expense.date} - {expense.note} -{' '}
-              {expense.isRecurring ? 'Recurring' : 'One-time'}
-            </p>
-            <button onClick={() => handleEdit(index)}>
-              <span role="img" aria-label="edit">✏️</span>
-            </button>
-            <button onClick={() => handleDelete(index)}>
-              <span role="img" aria-label="delete">🗑️</span>
-            </button>
-          </li>
-        ))}
-      </ul> */}
-    </div>
-  );
+    );
 };
 
 export default ExpenseTracker;

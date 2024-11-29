@@ -29,9 +29,13 @@ export const authToken = (req: Request, res: Response, next: NextFunction) => {
 
   jwt.verify(token, process.env.JWT_SECRET as string, (err, decodedToken) => {
     if (err) {
-      console.log("status code 403");
-      res.sendStatus(403);
-      return; 
+      if (err.name === 'TokenExpiredError') {
+        console.log("Token has expired.");
+        return res.status(401).json({ error: "Token expired" });  // Unauthorized
+      } else {
+        console.log("Error verifying token:", err);
+        return res.sendStatus(403);  // Forbidden
+      }
     }
 
     // Explicitly set only the email from the decoded token

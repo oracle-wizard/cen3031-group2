@@ -1,0 +1,179 @@
+/* General Container */
+.budget-category-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa; /* Uniform light background color */
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+}
+
+/* Title */
+.budget-category-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Category List */
+.category-list {
+    width: 80%; /* Increased width for better space usage */
+    max-width: 1200px; /* Wider maximum width */
+    margin: 0 auto;
+    border-radius: 8px;
+    background: #ffffff; /* White background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    overflow: hidden;
+    padding: 15px 0;
+}
+
+/* Individual Category Items */
+.category-item {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr; /* More space for category names */
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ececec;
+    gap: 20px; /* Space between columns */
+}
+
+.category-item:last-child {
+    border-bottom: none;
+}
+
+/* Category Name */
+.category-item span:first-child {
+    text-align: left;
+    font-size: 1.2rem; /* Slightly larger for readability */
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dollar Sign + Amount Container */
+.amount-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Increased spacing */
+    justify-content: flex-start; /* Align left */
+}
+
+/* Dollar Sign */
+.dollar-sign {
+    font-size: 1rem;
+    color: #007bff; /* Primary blue color for accents */
+}
+
+/* Amount Input */
+.edit-amount-input {
+    width: 100px; /* Fixed width for uniform layout */
+    padding: 5px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center; /* Center-align text inside the input */
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+    border: none;
+    padding: 10px 15px; /* Larger padding for better visibility */
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Red for delete buttons */
+    color: #fff;
+    justify-self: center; /* Align with input fields */
+    margin-left: 10px; /* Add spacing to the left */
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+.add-button {
+    background-color: #28a745; /* Green for add button */
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+}
+
+.add-button:hover {
+    background-color: #218838;
+}
+
+/* Add Category Form */
+.add-category-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.5rem;
+    gap: 20px; /* Increased gap for spacing */
+}
+
+.category-input,
+.amount-input {
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 300px; /* Wider input fields */
+}
+
+.category-input:focus,
+.amount-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Back Button */
+.navigation-buttons {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 15px 25px;
+    font-size: 1.2rem; /* Larger for emphasis */
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.3); /* Subtle shadow */
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .category-list {
+        width: 90%;
+    }
+
+    .budget-category-title {
+        font-size: 2rem;
+    }
+
+    .add-button,
+    .back-button {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+
+    .category-input,
+    .amount-input {
+        width: 100%;
+    }
+}

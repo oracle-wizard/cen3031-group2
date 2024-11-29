@@ -11,9 +11,12 @@ test('Registration page - valid registration', async () => {
   };
 
   try {
-    await axios.post(`${baseUrl}/api/delete`, { email: userData.email }, {
+    // // Delete request with payload
+    await axios.delete(`${baseUrl}/api/delete`, {
+      data: { email: userData.email }, // Include payload here
       headers: { 'Content-Type': 'application/json' },
     });
+
     // Send the registration request
     const response = await axios.post(`${baseUrl}/api/register`, userData, {
       headers: { 'Content-Type': 'application/json' },

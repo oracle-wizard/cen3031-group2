@@ -12,8 +12,7 @@ const DateInputUser: React.FC = () => {
   return (
     <input
       type="date"
-      className='tw-col-span-1 tw-border tw-pl-4'
-      placeholder={todayDate} // Placeholder set to today's date
+      className="tw-col-span-1 tw-border tw-pl-4"
       value={todayDate} // Value set to today's date
       onChange={(e) => setTodayDate(e.target.value)} // Update state when date changes
     />

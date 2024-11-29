@@ -1,135 +1,260 @@
 import { Request, Response } from 'express';
 import { execute } from '../database';
 
-export const getExpenses = async (req: Request, res: Response) => {
-  try {
-      // Extract only the email from req.user
-      const userEmail = req.user?.email;
-      if (!userEmail) {
-          throw new Error("User email not found in request");
-      }
-      console.log("Logged-in user's email:", userEmail);
+// Function to update TOTAL_SPENT for a specific user
+export const updateTotalSpend = async (req: Request, res: Response): Promise<void> => {
+    console.log("in update total spend")
+    try {
+    const query = `
+        UPDATE "C.SMELTZER"."BUDGETCATEGORY"
+        SET "TOTAL_SPENT" = (
+            SELECT SUM("EXPENSE_AMOUNT")
+            FROM "C.SMELTZER"."EXPENSE"
+            WHERE "C.SMELTZER"."EXPENSE"."CATEGORY_ID" = "C.SMELTZER"."BUDGETCATEGORY"."CATEGORY_ID"
+              AND LOWER("C.SMELTZER"."EXPENSE"."EMAIL") = LOWER(:EMAIL)
+        )
+        WHERE LOWER("EMAIL") = LOWER(:EMAIL)
+    `;
+    console.log("the query", query)
+    const binds = { EMAIL: req.user?.email };
+    console.log("the binds", binds)
+    
+    const result = await execute(query, binds);
+    console.log("the result", result)
 
-      const query = `
-          SELECT 
-            "EXPENSE_ID", 
-            "EXPENSE_TITLE", 
-            "CATEGORY_NAME", 
-            "EXPENSE_AMOUNT", 
-            "EXPENSE_DATE", 
-            "DESCRIPTION",
-            "EMAIL"
-          FROM "C.SMELTZER"."EXPENSE"
-          WHERE LOWER("EMAIL") = LOWER(:EMAIL)
-      `;
-
-      const binds = { EMAIL: userEmail }; // Bind only the email
-      console.log("Executing query with binds:", binds);
-
-      // Execute the query
-      const result = await execute(query, binds);
-      console.log("Result rows:", result.rows);
-
-      // Send only the rows to the client
-      res.status(200).json(result.rows);
-  } catch (error) {
-      console.error('Error fetching expenses:', error);
-      res.status(500).json({ error: 'Failed to retrieve expenses' });
-  }
+    // Check if any rows were affected
+    if (result.rowsAffected === 0) {
+        res.status(404).json({ error: 'No matching categories or expenses found for the given user.' });
+        return;
+    }
+        res.status(200).json({ message: 'TOTAL_SPENT updated successfully.' });
+    } catch (error) {
+        console.error('Error updating TOTAL_SPENT:', error);
+        res.status(500).json({ error: 'Failed to update TOTAL_SPENT.' });
+    }
 };
 
-export const addExpense = async (req: Request, res: Response) => {
+// Fetch all expenses for the logged-in user
+export const getExpenses = async (req: Request, res: Response): Promise<void> => {
     try {
-        const userEmail = req.user?.email; // Ensure the user's email is available
-        console.log("Logged-in user's email in addExpense:", userEmail); // Debugging
+        const userEmail = req.user?.email;
 
+        if (!userEmail) {
+            throw new Error("User email not found in request");
+        }
+
+        const query = `
+            SELECT 
+                e."EXPENSE_ID", 
+                e."EXPENSE_TITLE", 
+                b."CATEGORY_NAME",
+                e."EXPENSE_AMOUNT", 
+                e."EXPENSE_DATE", 
+                e."DESCRIPTION",
+                e."EMAIL"
+            FROM "C.SMELTZER"."EXPENSE" e
+            JOIN "C.SMELTZER"."BUDGETCATEGORY" b
+            ON e."CATEGORY_ID" = b."CATEGORY_ID"
+            WHERE LOWER(e."EMAIL") = LOWER(:EMAIL)
+        `;
+        const binds = { EMAIL: userEmail };
+
+        const result = await execute(query, binds);
+
+        if (!result.rows) {
+            res.status(404).json({ error: 'No expenses found for the given user' });
+            return;
+        }
+
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Error fetching expenses:', error);
+        res.status(500).json({ error: 'Failed to retrieve expenses' });
+    }
+};
+
+// Add a new expense
+export const addExpense = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userEmail = req.user?.email;
+        if (!userEmail) {
+            res.status(400).json({ error: "User email is required." });
+            return;
+        }
         const { expense_title, category_name, expense_amount, expense_date, description } = req.body;
+
+        const categoryQuery = `
+            SELECT "CATEGORY_ID" 
+            FROM "C.SMELTZER"."BUDGETCATEGORY"
+            WHERE LOWER("CATEGORY_NAME") = LOWER(:CATEGORY_NAME)
+              AND LOWER("EMAIL") = LOWER(:EMAIL)
+        `;
+        const categoryBinds = {
+            CATEGORY_NAME: category_name,
+            EMAIL: userEmail,
+        };
+
+        const categoryResult = await execute(categoryQuery, categoryBinds);
+
+        if (!categoryResult.rows || categoryResult.rows.length === 0) {
+            res.status(404).json({ error: 'Category not found for the given user' });
+            return;
+        }
+
+        const categoryId = categoryResult.rows[0][0]; // Access CATEGORY_ID directly from the first row
 
         const query = `
             INSERT INTO "C.SMELTZER"."EXPENSE" (
                 "EXPENSE_TITLE", 
-                "CATEGORY_NAME", 
+                "CATEGORY_ID", 
                 "EXPENSE_AMOUNT", 
                 "EXPENSE_DATE", 
                 "DESCRIPTION", 
                 "EMAIL"
             ) VALUES (
                 :EXPENSE_TITLE, 
-                :CATEGORY_NAME, 
+                :CATEGORY_ID, 
                 :EXPENSE_AMOUNT, 
                 TO_DATE(:EXPENSE_DATE, 'YYYY-MM-DD'), 
                 :DESCRIPTION, 
                 :EMAIL
             )
         `;
-
         const binds = {
             EXPENSE_TITLE: expense_title,
-            CATEGORY_NAME: category_name,
+            CATEGORY_ID: categoryId,
             EXPENSE_AMOUNT: expense_amount,
             EXPENSE_DATE: expense_date,
             DESCRIPTION: description || null,
-            EMAIL: userEmail
+            EMAIL: userEmail,
         };
 
-        console.log("Insert binds:", binds); // Debugging log to see if EMAIL is being passed
-
         await execute(query, binds);
-
+        
         res.status(200).json({ message: 'Expense added successfully' });
     } catch (error) {
         console.error('Error adding expense:', error);
         res.status(500).json({ error: 'Failed to add expense' });
     }
 };
-export const updateExpense = async (req: Request, res: Response) => {
-  try {
-      const { expense_id, expense_title, category_name, expense_amount, expense_date, description } = req.body;
 
-      const query = `
-          UPDATE "C.SMELTZER"."EXPENSE"
-          SET 
-              "EXPENSE_TITLE" = :EXPENSE_TITLE,
-              "CATEGORY_NAME" = :CATEGORY_NAME,
-              "EXPENSE_AMOUNT" = :EXPENSE_AMOUNT,
-              "EXPENSE_DATE" = TO_DATE(:EXPENSE_DATE, 'YYYY-MM-DD'),
-              "DESCRIPTION" = :DESCRIPTION
-          WHERE "EXPENSE_ID" = :EXPENSE_ID
-      `;
+// Update an existing expense
+export const updateExpense = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const {
+            expense_id,
+            expense_title,
+            category_name,
+            expense_amount,
+            expense_date,
+            description,
+        } = req.body;
 
-      const binds = {
-          EXPENSE_ID: expense_id,
-          EXPENSE_TITLE: expense_title,
-          CATEGORY_NAME: category_name,
-          EXPENSE_AMOUNT: expense_amount,
-          EXPENSE_DATE: expense_date,
-          DESCRIPTION: description || null
-      };
+        const userEmail = req.user?.email;
+        if (!userEmail) {
+            res.status(400).json({ error: "User email is required." });
+            return;
+        }
 
-      await execute(query, binds);
+        // Fetch the category ID for the provided category name and email
+        const categoryQuery = `
+            SELECT "CATEGORY_ID"
+            FROM "C.SMELTZER"."BUDGETCATEGORY"
+            WHERE LOWER("CATEGORY_NAME") = LOWER(:CATEGORY_NAME)
+              AND LOWER("EMAIL") = LOWER(:EMAIL)
+        `;
+        
+        const categoryBinds = {
+            CATEGORY_NAME: category_name,
+            EMAIL: userEmail,
+        };
 
-      res.status(200).json({ message: 'Expense updated successfully' });
-  } catch (error) {
-      console.error('Error updating expense:', error);
-      res.status(500).json({ error: 'Failed to update expense' });
-  }
+        const categoryResult = await execute(categoryQuery, categoryBinds);
+
+        if (!categoryResult.rows || categoryResult.rows.length === 0) {
+            res.status(404).json({ error: 'Category not found for the given user' });
+            return;
+        }
+
+        const categoryId = categoryResult.rows[0][0]; // Access CATEGORY_ID directly from the first row
+
+        // Validate and format the expense_date
+        let formattedDate: string | undefined = undefined;
+
+        if (expense_date && expense_date.trim() !== '') {
+            // Ensure date is in YYYY-MM-DD format
+            const parsedDate = new Date(expense_date);
+            if (!isNaN(parsedDate.getTime())) {
+                formattedDate = parsedDate.toISOString().split('T')[0];
+            } else {
+                res.status(400).json({ error: 'Invalid expense_date format' });
+                return;
+            }
+        }
+
+        // Construct the SQL query and bindings
+        let updateQuery = `
+            UPDATE "C.SMELTZER"."EXPENSE"
+            SET 
+                "EXPENSE_TITLE" = :EXPENSE_TITLE,
+                "CATEGORY_ID" = :CATEGORY_ID,
+                "EXPENSE_AMOUNT" = :EXPENSE_AMOUNT,
+                "DESCRIPTION" = :DESCRIPTION
+        `;
+
+        const binds: Record<string, any> = {
+            EXPENSE_ID: expense_id,
+            EXPENSE_TITLE: expense_title,
+            CATEGORY_ID: categoryId,
+            EXPENSE_AMOUNT: expense_amount,
+            DESCRIPTION: description || null,
+        };
+
+        if (formattedDate) {
+            updateQuery += `,
+                "EXPENSE_DATE" = TO_DATE(:EXPENSE_DATE, 'YYYY-MM-DD')
+            `;
+            binds.EXPENSE_DATE = formattedDate;
+        }
+
+        updateQuery += ` WHERE "EXPENSE_ID" = :EXPENSE_ID`;
+
+        console.log("Executing query:", updateQuery); // Debug query
+        console.log("With binds:", binds); // Debug binds
+
+        await execute(updateQuery, binds);
+
+        res.status(200).json({ message: 'Expense updated successfully' });
+    } catch (error) {
+        console.error('Error updating expense:', error);
+        res.status(500).json({ error: 'Failed to update expense' });
+    }
 };
-export const deleteExpense = async (req: Request, res: Response) => {
-  try {
-      const { expense_id } = req.body;
 
-      const query = `
-          DELETE FROM "C.SMELTZER"."EXPENSE"
-          WHERE "EXPENSE_ID" = :EXPENSE_ID
-      `;
 
-      const binds = { EXPENSE_ID: expense_id };
+// Delete an expense
+export const deleteExpense = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { expense_id } = req.body;
 
-      await execute(query, binds);
+        const userEmail = req.user?.email;
+        if (!userEmail) {
+            res.status(400).json({ error: "User email is required." });
+            return;
+        }
 
-      res.status(200).json({ message: 'Expense deleted successfully' });
-  } catch (error) {
-      console.error('Error deleting expense:', error);
-      res.status(500).json({ error: 'Failed to delete expense' });
-  }
+        const query = `
+            DELETE FROM "C.SMELTZER"."EXPENSE"
+            WHERE "EXPENSE_ID" = :EXPENSE_ID
+        `;
+
+        const binds = { EXPENSE_ID: expense_id };
+
+        await execute(query, binds);
+
+        res.status(200).json({ message: 'Expense deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting expense:', error);
+        res.status(500).json({ error: 'Failed to delete expense' });
+    }
 };

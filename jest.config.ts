@@ -1,7 +1,7 @@
 // jest.config.ts
 export default {
     preset: 'ts-jest',
-    testEnvironment: 'node',
+    testEnvironment: 'jsdom',
     transform: {
       '^.+\\.tsx?$': 'ts-jest', // Use ts-jest to transform TypeScript files
     },

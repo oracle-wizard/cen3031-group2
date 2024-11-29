@@ -1,28 +1,68 @@
-import * as jwt from 'jsonwebtoken'
-import * as dotenv from "dotenv"; 
+import axios from 'axios';
 
-dotenv.config()
+const api = axios.create({
+    baseURL: 'http://localhost:3000/api', 
+    withCredentials: true,
+    timeout: 5000,
+    headers: {
+        'Content-Type': 'application/json',
+    }, 
+});
 
-export const refreshToken = async (req , res) =>{
-    const {refreshToken}  = req.cookies;
-    if(! refreshToken) {
-      console.log("No refresh token provided")
-      return res.status(401);
+// Attach the token to every request if available
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            console.log("Attaching access token to request.");
+            config.headers.Authorization = `Bearer ${token}`;
+        } else {
+            console.log("No access token found for this request.");
+        }
+        return config;
+    },
+    (error) => {
+        console.log(`Error in request interceptor: ${error}`);
+        return Promise.reject(error);
     }
-    try{
-      const user = jwt.verify(req.cookies.refreshToken, process.env.JWT_SECRET as string);
-      if(!user) {
-        return res.status(401).json({error: "Invalid refresh token"})
-      }
-      const accessToken = jwt.sign({email: user}, process.env.JWT_SECRET as string, {'expiresIn': '10m'});
-      console.log(`New token has been generated ${accessToken}`)
-      res.json({token: accessToken})
-    }
-    catch(error){
-      console.log("Generating a refresh token failed.")
-      console.log(error);
-      res.status(500).json({ error: "Login failed." });
-    }
-  };
+);
 
-export default {refreshToken}
+// Handle 401 errors and refresh the token
+api.interceptors.response.use(
+    (response) => {
+        console.log("Response received successfully.");
+        return response;
+    }, 
+    async (error) => {
+        console.log(`Error response status: ${error.response?.status}`);
+        const originalRequest = error.config;
+
+        // If 401 and retry hasn't been attempted
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const { data } = await api.post('/refresh-token', {}, { withCredentials: true });
+                const newAccessToken = data.token;
+
+                console.log("New access token received and stored.");
+                localStorage.setItem('accessToken', newAccessToken);
+
+                // Attach the new token to the original request
+                api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+                originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                
+                return api(originalRequest); // Retry the original request
+            } catch (refreshError) {
+                console.log("Failed to refresh token. Redirecting to login.");
+                window.location.href = "/login";
+                return Promise.reject(refreshError);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
+
+export const refreshToken = api; // Named export for the Axios instance
+export default refreshToken;

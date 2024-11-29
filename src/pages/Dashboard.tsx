@@ -46,6 +46,10 @@ const Dashboard: React.FC = () => {
         navigate('/expense-tracker');
     };
 
+    const handleEditBudgetClick = () => {
+        navigate('/budget-category');
+    };
+
     return (
         <div className="dashboard-container" style={{ minHeight: '100vh' }}>
             <h2>Dashboard</h2>
@@ -68,6 +72,9 @@ const Dashboard: React.FC = () => {
             {message && <div className='alert alert-info mt-3'>{message}</div>}
             <button onClick={handleExpenseTrackerClick} className="btn btn-secondary mt-3">
                 Expense Tracker
+            </button>
+            <button onClick={handleEditBudgetClick} className="btn btn-secondary mt-3">
+                Edit Budget
             </button>
             <LogoutButton />
         </div>

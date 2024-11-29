@@ -11,7 +11,7 @@ import {
     updateBudgetCategory,
     deleteBudgetCategory,
 } from '../controllers/budgetController'
-
+import { updateAccount } from '../controllers/updateAccountController';
 
 const router = Router();
 router.post('/register', register);

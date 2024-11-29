@@ -3,21 +3,20 @@ import { execute } from '../database';
 
 export const updateAccount = async (req: Request, res: Response) => {
   try {
-      const { firstName, lastName, oldEmail, newEmail } = req.body;
+      const { firstName, lastName, newEmail } = req.body;
 
       const query = `
           UPDATE "C.SMELTZER"."USERS"
           SET 
               "FIRST_NAME" = :FIRST_NAME,
               "LAST_NAME" = :LAST_NAME,
-              "EMAIL" = :NEW_EMAIL,
+              "EMAIL" = :NEW_EMAIL
           WHERE "EMAIL" = :OLD_EMAIL
       `;
-
       const binds = {
           FIRST_NAME: firstName,
           LAST_NAME: lastName,
-          OLD_EMAIL: oldEmail,
+          OLD_EMAIL: req.user?.email,
           NEW_EMAIL: newEmail
       };
 

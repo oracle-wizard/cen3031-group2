@@ -21,7 +21,7 @@ const App: React.FC = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/update-profile" element={<UpdateAccount />} />
+            <Route path="/update-account" element={<UpdateAccount />} />
             <Route path="/dashboard" element ={<Dashboard/>} />
             <Route path ="/reset-password" element = {<ResetPassword/>}/>
             <Route path="/expense-tracker" element={<ExpenseTracker />} /> 

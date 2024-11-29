@@ -8,7 +8,6 @@ const UpdateAccount: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    oldEmail: '',
     newEmail: ''
   });
 
@@ -18,8 +17,8 @@ const UpdateAccount: React.FC = () => {
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
-  const goToExpenses = () => {
-    navigate('/expense-tracker')
+  const goToDashboard = () => {
+    navigate('/dashboard')
   }
 
   // Handle input changes
@@ -77,16 +76,6 @@ const UpdateAccount: React.FC = () => {
 
           <input
             type="email"
-            name="oldEmail"
-            className="form-control"
-            placeholder="Old Email Address"
-            value={formData.oldEmail}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="email"
             name="newEmail"
             className="form-control"
             placeholder="New Email Address"
@@ -101,9 +90,8 @@ const UpdateAccount: React.FC = () => {
         <button
           type="button"
           className="btn btn-lg btn-secondary btn-block mt-3" /* Added `mt-3` for spacing */
-          onClick={goToExpenses}
-          >
-          Home
+          onClick={goToDashboard}>
+          Dashboard
         </button>
         </div>
 

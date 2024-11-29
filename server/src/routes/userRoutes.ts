@@ -35,5 +35,5 @@ router.delete('/delete-budget-category', authToken, deleteBudgetCategory);
 router.put('/update-total-spend', authToken, updateTotalSpend);
 router.get('/get-user-income', authToken, getUserIncome);
 router.put('/update-user-income', authToken, updateUserIncome);
-router.put('/account-update', authToken, updateAccount);
+router.put('/update-account', authToken, updateAccount);
 export default router;

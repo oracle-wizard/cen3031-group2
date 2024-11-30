@@ -8,14 +8,10 @@ import UpdateProfile from './pages/AccountUpdate';
 import ResetPassword from './pages/ResetPasswordPage';
 import ExpenseTracker from './pages/ExpenseTracker';
 import BudgetCategory from './pages/BudgetCategory';
-<<<<<<< HEAD
-import Dashboard from './pages/main.tsx'
-=======
 import Layout from './pages/Layout';
 import UserIncome from './pages/UserIncome';
 import InactivityHandler from './components/InactivityHandler'; // Import the InactivityHandler
->>>>>>> 73a8697ecfdb444f16f201ebd6d7eb22715c79de
-
+import Dashboard from './pages/main';
 const App: React.FC = () => {
   return (
     <Router>

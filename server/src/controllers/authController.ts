@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt'
 import generateAndSend from "../middleware/sendEmail";
 import { addBudgetCategory } from './budgetController';
 
-import { refreshToken } from "./refreshTokenController";
 
 interface User{
   firstName: string,
@@ -67,7 +66,7 @@ export const register = async (req: Request, res: Response) => {
       res.cookie('refreshToken', refreshToken, {
           httpOnly: true,
           sameSite: 'strict',
-          maxAge: 60 * 60 * 1000,
+          maxAge: 15 * 60 * 60 * 1000,
       });
 
       res.status(200).json({ accessToken });

@@ -130,6 +130,10 @@ const Dashboard: React.FC = () => {
         navigate('/budget-category');
     };
 
+    const handleUpdateAccountClick = () => {
+        navigate('/update-account');
+    };
+
     const handleUserIncomeClick = () => {
         navigate('/user-income'); // Navigate to the UserIncome page
     };
@@ -165,7 +169,10 @@ const Dashboard: React.FC = () => {
                 </button>
                 <button onClick={handleUserIncomeClick} className="btn btn-secondary mt-3">
                 User Income
-            </button>
+                </button>
+                <button onClick={handleUpdateAccountClick} className="btn btn-secondary mt-3">
+                    Update Account
+                </button>
             <LogoutButton />
             </div>
         </div>

@@ -46,10 +46,14 @@ with this format:
 ORACLE_USER=your_username
 ORACLE_PASSWORD=your_password
 ORACLE_CONNECT_STRING=oracle.cise.ufl.edu:1521/orcl
+JWT_SECRET=your_key
 
 4. Run the project 
 
-Starting both the backend and frontend in the root folder directory and run:
+Start the frontend in the root folder directory and run:
+npm run dev
+
+Start the backend by navigating into the server directory and run:
 npm run dev
 
 5. Access the application:

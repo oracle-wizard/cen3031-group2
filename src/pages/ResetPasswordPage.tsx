@@ -41,7 +41,7 @@ const ResetPassword: React.FC =()=>{
             headers: {
               'Content-Type': 'application/json',
             }});
-        if(reponse.status ===200){
+        if(reponse.status === 200){
             console.log("response is 200")
             setSuccess("Please check your email. ")
 

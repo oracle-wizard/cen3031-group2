@@ -11,13 +11,16 @@ const RegistrationPage: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
+
   const [message, setMessage] = useState('');
+
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
   // Function to navigate to the registration page
   const goToLogin = () => {
     navigate('/login');
   };
+  
   const validatePassword = (password : string)=>{
    
     if(password.length<8 || !/\d/.test(password) || ! /[A-Z]/.test(password) ||  ! /[a-z]/.test(password) ){
@@ -25,6 +28,7 @@ const RegistrationPage: React.FC = () => {
     }
     return '';
    }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -108,7 +112,7 @@ const RegistrationPage: React.FC = () => {
           type="email"
           name="email"
           className="form-control"
-          placeholder="Email address"
+          placeholder="Email Address"
           value={formData.email}
           onChange={handleChange}
           required
@@ -136,7 +140,7 @@ const RegistrationPage: React.FC = () => {
 
 
         <div>
-        <button className="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+        <button className="btn btn-lg btn-primary btn-block mt-3" type="submit">Register</button>
         </div>
         {/* Home Button Below with Margin */}
         <button

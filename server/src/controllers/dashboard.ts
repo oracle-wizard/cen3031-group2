@@ -248,6 +248,9 @@ export const getIncomeGraph = async (req: Request, res: Response)=>{
     }
 }
 export default {addBudget, displayBudget,getExpensesTotal, UsedBudgetPerCat, dispBudgetPerCategory, getExpensesGraph};
+
+
+
 /*
 const date = req.body.date;
 const [year, month] = date.split('-');

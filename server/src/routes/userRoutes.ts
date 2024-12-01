@@ -36,7 +36,6 @@ router.delete('/delete-budget-category', authToken, deleteBudgetCategory);
 router.put('/update-total-spend', authToken, updateTotalSpend);
 router.get('/get-user-income', authToken, getUserIncome);
 router.put('/update-user-income', authToken, updateUserIncome);
-<<<<<<< HEAD
 router.post('/display-budget', authToken, displayBudget)
 router.post('/get-expenses', authToken, getExpensesTotal)
 router.post('/get-expenses-categories', authToken, getExpensesCategories)
@@ -45,15 +44,6 @@ router.post('/display-budget-per-category', authToken, dispBudgetPerCategory)
 router.post('/get-budget', authToken, getBudget)
 router.post('/get-expenses-graph' , authToken, getExpensesGraph)
 router.post('/get-income-graph' , authToken, getIncomeGraph)
-
-
-
-
-
-
-
-=======
 router.put('/update-account', authToken, updateAccount);
->>>>>>> 61c35486453906bdf2ed0e2358dcec56cb9507d1
 export default router;
 

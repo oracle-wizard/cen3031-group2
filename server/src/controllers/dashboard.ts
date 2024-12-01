@@ -83,15 +83,16 @@ export const  getExpensesCategories =async (req: Request, res: Response) =>{
   
     const query = `
         SELECT 
-            b."CATEGORY_NAME",
-            e."EXPENSE_AMOUNT"
+        b."CATEGORY_NAME",
+        SUM(e."EXPENSE_AMOUNT")
         FROM "C.SMELTZER"."EXPENSE" e
         JOIN "C.SMELTZER"."BUDGETCATEGORY" b
         ON e."CATEGORY_ID" = b."CATEGORY_ID"
         WHERE e.email =: EMAIL
+        GROUP BY b."CATEGORY_NAME"
+        
     `;
-    
-  
+
    const result = await execute(query, email);
    if(!result.rows || result.rows.length===0){
     res.sendStatus(404);

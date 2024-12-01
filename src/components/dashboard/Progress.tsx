@@ -1,7 +1,7 @@
 import  api  from "../../axiosInstance";
 import { useAuth } from '../../../server/src/context/authContext'
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import { Line, Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -105,18 +105,17 @@ const Progress:React.FC = () => {
     return(
     <div  className="col-4 bg-light border-end vh-100">
         <div className="row p-3 ml-2" style={{marginLeft: '20px'}}>
-            <p className="text-start fw-bold">Track your budget individually</p></div>
-            {combinedData.map((item:any)=> (
-                <div  key={item.category} className="row">
-                <div className="col-7 mb-2 text-start ms-1 d-flex justify-content-between mb-2 align-items-start" ><span >{item.category}</span>  
-                <div className="row align-items-start justify-content-between">
-                <span className="col-5 text-end d-flex justify-content-start align-items-start" style={{marginRight: '10px'}}>${item.availableAmount}</span>
-                    <div className="col-5 d-flex text-start justify-content-between align-items-start" style={{fontWeight:'lighter'}}>
-                 {item.usedAmount!==0 ? `-$${item.usedAmount}` : 0}</div>
-                    </div>
-                    </div>
-                    <div className="col-4 text-end">
-                        <div className= "progress mb-2">
+            <p className="text-start fw-bold">Track your budget individually</p>
+        </div>
+
+        {combinedData.map((item:any)=> (
+            <div className="tw-grid tw-grid-cols-[200px_75px_125px_1fr] my-2">
+                <div className="tw-justify-self-start tw-pl-2" >{item.category}</div>  
+                <div className="">${item.availableAmount}</div>
+                <div className="">{item.usedAmount!==0 ? `-$${item.usedAmount}` : 0}</div> 
+                
+                <div className="">
+                    <div className= "progress mb-2">
                         <div className="progress-bar"
                             style={{backgroundColor:`${getColor(item.percentage)}`, 
                             width: item.percentage + '%'}}
@@ -124,18 +123,19 @@ const Progress:React.FC = () => {
                             aria-valuenow={item.usedAmount}
                             aria-valuemin={0} 
                             aria-valuemax={200}> 
-                            </div>
-                         </div> 
-                    </div>  
-                </div>))
-            }
-                    <div className="d-flex flex-column align-items-center" >
-                        <button className="btn btn-primary w-auto mt-5" onClick={handleEditBudgetClick}>Edit Budget</button >
-                        <button onClick={handleUserIncomeClick} className="btn btn-primary m-4 w-auto">
-                        Set Income
-                        </button>
-                    </div>
-                </div>)
+                        </div>
+                    </div> 
+                </div>  
+            </div>
+        ))}
+        
+        <div className="d-flex flex-column align-items-center" >
+            <button className="btn btn-primary w-auto mt-5" onClick={handleEditBudgetClick}>Edit Budget</button >
+            <button onClick={handleUserIncomeClick} className="btn btn-primary m-4 w-auto">
+                Set Income
+            </button>
+        </div>
+    </div>)
 }
 export default Progress;
 

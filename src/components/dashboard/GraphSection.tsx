@@ -1,7 +1,7 @@
 import  api  from "../../axiosInstance";
 import { useAuth } from '../../../server/src/context/authContext'
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import { Line} from 'react-chartjs-2';
 import 'chart.js/auto';
 import '@fortawesome/fontawesome-free/css/all.min.css';

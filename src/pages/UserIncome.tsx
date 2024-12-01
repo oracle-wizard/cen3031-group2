@@ -57,7 +57,6 @@ const UserIncome: React.FC = () => {
 
     return (
         <div className="user-income-container">
-            <h1>User Income</h1>
             <div className="income-display">
                 <label>Current Income:</label>
                 <span className="current-income">{formattedIncome || '$0'}</span>
@@ -75,9 +74,6 @@ const UserIncome: React.FC = () => {
                 </button>
             </div>
             {message && <div className="message">{message}</div>}
-            <button onClick={() => navigate('/dashboard')} className="back-button">
-                Back to Dashboard
-            </button>
         </div>
     );
 };

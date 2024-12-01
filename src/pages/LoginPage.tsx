@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
     }
 
   return (
-    <div className="text-center tw-flex tw-w-[900px] tw-justify-between tw-pb-24">
+    <div className="text-center tw-flex tw-w-[900px] tw-justify-between tw-pb-24 tw-mt-96">
           <div className=''>
               <div style={{ backgroundColor: 'white', textAlign: 'center', marginTop: '20px' }}>
                 <img 

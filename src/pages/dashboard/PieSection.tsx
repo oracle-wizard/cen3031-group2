@@ -48,9 +48,9 @@ const PieSection:React.FC = ()=>{
     }
     const handleDateChange = (date: Date | null) => {
         setSelectedDate(date);
-        if (date) {
-          console.log("Selected Date:", date);
-        }
+     //   if (date) {
+       //   console.log("Selected Date:", date);
+       // }
         displayExpenses()
       };
       const data ={
@@ -111,7 +111,7 @@ const PieSection:React.FC = ()=>{
                 </div></div>
         <div className="col-12 mt-5"><Pie data={data} options={options} />   </div></div>
       
-        <button className="btn btn-primary m-5" onClick={handleExpenseTrackerClick}>See all expenses</button>
+        <button className="btn btn-primary m-5" onClick={handleExpenseTrackerClick}>Expense Tracker</button>
     </div>)
 }
 

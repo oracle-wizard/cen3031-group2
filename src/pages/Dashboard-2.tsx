@@ -12,7 +12,7 @@ const Dashboard:React.FC = () =>{
         <div className="row p-4"></div>
             <div className="row">
                 <Progress/>
-            <div className="col-6">
+            <div className="col-5">
             <div className="row">
                 <Stats/>
                 <GraphSection/>

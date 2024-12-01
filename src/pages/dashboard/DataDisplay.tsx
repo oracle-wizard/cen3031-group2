@@ -39,7 +39,7 @@ const Stats : React.FC = ()=>{
             const response = await api.post("/display-budget", {email}, {withCredentials:true});
         if(response.status===200){
         const {totalIncome, balance} = response.data;
-        console.log(totalIncome)
+       // console.log(totalIncome)
         setTotalIncome(totalIncome);
         setBalance(balance);
              }
@@ -57,7 +57,7 @@ const Stats : React.FC = ()=>{
         try{
             const response = await api.post("/get-expenses", {email});
             if(response.status===200){
-                console.log(response.data.expenses)
+              //  console.log(response.data.expenses)
                 setExpenses(response.data.expenses)
             }
             else{
@@ -97,11 +97,11 @@ const Stats : React.FC = ()=>{
         <div className="row">
         <div className ="col-6 text-start fw-bold">
         {new Date(Date.now()).toLocaleString('default', { day: 'numeric',month:'long', year:"numeric"})}
-            </div></div>
+         </div>
+        </div>
         <div className="font-weight-bold fw-bold fs-4"
             style={{color:"#009df7"}}>Current Balance</div>
         <div className="font-weight-bold p fs-4 fw-bold">${budget-expenses}</div>
-
         <div  className="row">
         <div className="col-4 mt-3 fw-bold fs-5">Total Income</div>
         <div className="col-4 mt-3 fw-bold fs-5" >Expenses</div>
@@ -113,15 +113,13 @@ const Stats : React.FC = ()=>{
         <div className="col-4 p-1 fs-5">${budget}</div>
         </div>
         <div  className="row">
-        <div className="col-4 mt-3 fw-bold">Average Income</div>
-        <div className="col-4 mt-3 fw-bold">Average Spending</div>
-        <div className="col-4 mt-3 fw-bold">Total Saving</div>
+        
+        <div className="col-4 mt-3 fw-bold d-flex justify-content-center align-items-center">
+        Average Spending</div>
         </div>
 
         <div  className="row">
-        <div className="col-4 p-1">$2000</div>
         <div className="col-4 p-1">$5000</div>
-        <div className="col-4 p-1">$1000</div>
         </div>
 
 

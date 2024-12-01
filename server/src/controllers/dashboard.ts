@@ -175,7 +175,8 @@ export const getBudget = async (req: Request, res: Response)=>{
         const query = `
         SELECT SUM(allocated_amount)
         FROM "C.SMELTZER"."BUDGETCATEGORY" 
-        WHERE "EMAIL" =:email`; 
+        WHERE "EMAIL" =:email` 
+        ; 
         const result = await execute(query, { email:{ val: email} });
         if(!result.rows || result.rows.length ===0){
             res.sendStatus(404);
@@ -210,14 +211,40 @@ export const getExpensesGraph =async (req: Request, res: Response)=>{
             res.sendStatus(404);
             return;
         }
-        console.log(getExpensesGraph, result.rows[0])
-        const value = result.rows[0] as any
-        res.status(200).json({expenses: value[0]})
+        console.log("getExpensesGraph", result.rows)
+        res.status(200).json({expenses: result.rows});
     
     }
     catch(err){
-        console.log("getExpensesGraph error:",err)
-        res.sendStatus(500)
+        console.log("getExpensesGraph error:",err);
+        res.sendStatus(500);
+    }
+}
+
+export const getIncomeGraph = async (req: Request, res: Response)=>{
+    try{
+        const email = req.body.email;
+        const query = `
+        SELECT SUM(total_income), 
+        EXTRACT(YEAR FROM created_date), 
+        EXTRACT(MONTH FROM created_date)
+        FROM "C.SMELTZER".money 
+        WHERE "EMAIL" =:email
+        GROUP BY 
+            EXTRACT(YEAR FROM created_date), 
+            EXTRACT(MONTH FROM created_date)`; 
+        const result = await execute(query, email);
+        if(!result.rows || result.rows.length ===0){
+            res.status(404).json({message: 'No income found for this user.'});
+            return;
+        }
+        console.log("getIncomeGraph", result.rows)
+        res.status(200).json({income: result.rows});
+    
+    }
+    catch(err){
+        console.log("getExpensesGraph error:",err);
+        res.sendStatus(500);
     }
 }
 export default {addBudget, displayBudget,getExpensesTotal, UsedBudgetPerCat, dispBudgetPerCategory, getExpensesGraph};

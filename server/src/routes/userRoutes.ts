@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {register, login, logout, resetPassword, verifyCode, deleteUser, setNewPassword} from '../controllers/authController'
 import { refreshToken } from '../controllers/refreshTokenController';
 import {addBudget, displayBudget, getExpensesTotal, getExpensesCategories,
-         UsedBudgetPerCat, dispBudgetPerCategory, getBudget, getExpensesGraph} from '../controllers/dashboard'
+        getIncomeGraph, UsedBudgetPerCat, dispBudgetPerCategory, getBudget, getExpensesGraph} from '../controllers/dashboard'
 import authToken from '../middleware/authenticateToken';
 import { getExpenses, addExpense, updateExpense, deleteExpense, updateTotalSpend } from '../controllers/expenseController';
 import { getUserIncome, updateUserIncome } from '../controllers/userIncomeController';
@@ -43,6 +43,8 @@ router.post('/display-used-budget-per-category', authToken, UsedBudgetPerCat)
 router.post('/display-budget-per-category', authToken, dispBudgetPerCategory)
 router.post('/get-budget', authToken, getBudget)
 router.post('/get-expenses-graph' , authToken, getExpensesGraph)
+router.post('/get-income-graph' , authToken, getIncomeGraph)
+
 
 
 

@@ -11,7 +11,7 @@ import BudgetCategory from './pages/BudgetCategory';
 import Layout from './pages/Layout';
 import UserIncome from './pages/UserIncome';
 import InactivityHandler from './components/InactivityHandler'; // Import the InactivityHandler
-import Dashboard from './pages/main';
+import Dashboard from './pages/Dashboard-2';
 const App: React.FC = () => {
   return (
     <Router>

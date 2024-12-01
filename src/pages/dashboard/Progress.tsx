@@ -92,7 +92,6 @@ const Progress:React.FC = () => {
             const amount = usedItem ? usedItem.amount : 0; 
             const available = availItem.amount;
             const percentage = (amount / available) * 100;
-
             return {
                 category: availItem.category,
                 usedAmount: amount,
@@ -103,19 +102,20 @@ const Progress:React.FC = () => {
         });
         setCombinedData(data);
     };
-    
-
     return(
-    <div  className="col-3 bg-light border-end vh-100">
-        <div className="row p-3">
+    <div  className="col-4 bg-light border-end vh-100">
+        <div className="row p-3 ml-2" style={{marginLeft: '20px'}}>
             <p className="text-start fw-bold">Track your budget individually</p></div>
             {combinedData.map((item:any)=> (
                 <div  key={item.category} className="row">
-                    
-                <div className="col-5 mb-2 text-start ms-1 d-flex justify-content-between "><span >{item.category}</span>  
-                    <span className=" text-end" style={{fontWeight:'lighter',  fontSize:'12px'}}>-${item.usedAmount}</span></div>
-                    
-                    <div className="col-6 text-end">
+                <div className="col-7 mb-2 text-start ms-1 d-flex justify-content-between mb-2 align-items-start" ><span >{item.category}</span>  
+                <div className="row align-items-start justify-content-between">
+                <span className="col-5 text-end d-flex justify-content-start align-items-start" style={{marginRight: '10px'}}>${item.availableAmount}</span>
+                    <div className="col-5 d-flex text-start justify-content-between align-items-start" style={{fontWeight:'lighter'}}>
+                 {item.usedAmount!==0 ? `-$${item.usedAmount}` : 0}</div>
+                    </div>
+                    </div>
+                    <div className="col-4 text-end">
                         <div className= "progress mb-2">
                         <div className="progress-bar"
                             style={{backgroundColor:`${getColor(item.percentage)}`, 
@@ -123,16 +123,14 @@ const Progress:React.FC = () => {
                             role="progressbar"
                             aria-valuenow={item.usedAmount}
                             aria-valuemin={0} 
-                            aria-valuemax={200}>
-                                
+                            aria-valuemax={200}> 
                             </div>
-                         </div><span className="text-end" style={{ fontWeight: "lighter", fontSize:'10px' }}>
-                            ${item.availableAmount}
-                        </span>
+                         </div> 
                     </div>  
-                </div>))}
-                    <div className="d-flex flex-column align-items-center">
-                        <button className="btn btn-primary m-4 w-auto " onClick={handleEditBudgetClick} >Edit Budget</button >
+                </div>))
+            }
+                    <div className="d-flex flex-column align-items-center" >
+                        <button className="btn btn-primary w-auto mt-5" onClick={handleEditBudgetClick}>Edit Budget</button >
                         <button onClick={handleUserIncomeClick} className="btn btn-primary m-4 w-auto">
                         Set Income
                         </button>

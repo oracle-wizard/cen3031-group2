@@ -9,22 +9,46 @@ import { color } from "chart.js/helpers";
 import { MdBorderColor } from "react-icons/md";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState} from "react";
+interface Graph{
+    amount: Number,
+    month: Number,
+    year: Number
+}
 const GraphSection:React.FC = () => {
+
     const email = useAuth()
-    const [GraphData, setGraphData] = useState([])
+    const [ExpGraphData, setExpGraphData] = useState<Graph[]>([])
+   // const [GraphData, setGraphData] = useState<Graph[]>([])
 
     const navigate =useNavigate();
     useEffect(()=>{
-        displayGraph()
+        displayExpenses();
+        //displayIncome();
 
     }, [email, navigate])
 
-    const displayGraph= async()=>{
+    const displayExpenses= async()=>{
         try{
          const response = await api.post('/get-expenses-graph',
              {email}, {withCredentials:true} )
          if(response.status===200){
-            setGraphData(response.data.data);
+            const data = response.data.expenses;
+     
+            const transformedData  = data.map((row: [number, number, number])=>({
+                amount: row[0],
+                month: row[2], 
+                year:row[1]
+            }));      
+            const sortedData = transformedData.sort((a, b)=>{
+                if(a.year!=b.year){
+                    return a.year-b.year
+                }
+                return a.month - b.month
+            })
+
+            setExpGraphData(sortedData);
+           // console.log('ExpGraphData', ExpGraphData);
+            
          }
         } 
 
@@ -32,34 +56,97 @@ const GraphSection:React.FC = () => {
              console.log(err)
         }
      }
+    /* const displayIncome = async ()=>{
+        try{
+            const response = await api.post('/get-income-graph',
+                {email}, {withCredentials:true} )
+            if(response.status===200){
+               const data = response.data.income;
+               const transformedData  = data.map((row: [number, number, number])=>({
+                   amount: row[0],
+                   month: row[2], 
+                   year:row[1]
+               }));      
+               const sortedData = transformedData.sort((a, b)=>{
+                   if(a.year!=b.year){
+                       return a.year-b.year
+                   }
+                   return a.month - b.month
+               })
 
+                  const expensesMerged = ExpGraphData.map((item:any)=>{
+                
+                    const income = sortedData.find((itemS:any)=> {itemS.month === item.month && itemS.year === item.year });
+                    const incomeAmount = income ? income.amount : 0;
+                    return{
+                        month: item.month,
+                        year: item.year,
+                        expenseAmount: item.amount,
+                        incomeAmount:incomeAmount
+                        
 
+                    }
+               })
+            const merged = expensesMerged.map((item:any)=>{
+                
+                const income = sortedData.find((itemS:any)=> {itemS.month === item.month && itemS.year === item.year });
+                const incomeAmount = income ? income.amount : 0;
+                return{
+                    month: item.month,
+                    year: item.year,
+                    expenseAmount: item.amount,
+                    incomeAmount:incomeAmount
+                    
 
+                }
+           })
 
+               console.log("new data",sortedData)
+
+               setGraphData(sortedData);
+               console.log('GraphData', GraphData);
+            }
+            else{
+                console.log(response)
+            }
+           } 
+   
+           catch(err){
+                console.log(err)
+           }
+     }
+*/
     const data = {
-        labels: ['January', 'February', 'March', 'April', "May", "June", "July", "August"], 
+        labels:ExpGraphData.map((item)=>`${item.month}-${item.year}`),
         datasets:[{
-            label:'Expenses', backgroundColor: 'red', borderColor: 'red',
-            data:[3450, 1900, 5443, 6455, 2432, 4994, 9009, 2994, 4324, 2324, 4002 ]
-        }, 
-        {label:'Income', backgroundColor: 'green', borderColor: 'green',
-            data:[12300, 10030, 7599,8003, 8045, 9045, 5060, 5883, 10044]
-        }
+            label:'Expenses',
+            borderWidth: 2,  
+            data:ExpGraphData.map((item)=>item.amount), 
+            fill:false
+        },
     ]
     }
+ 
     const option2={
-        plugins:{
+       plugins:{
             legend:{
                 position:'top', 
-                align: 'end'
-            }
+                align:'end',
+                labels:{
+                    color:'black', 
+                    boxWidth: 20,
+                    usePointStyle: true,
+                    backgroundColor: 'Green'
+                    },
+                },
+            },
+    
         }
-    }
     return(      
         <div className="col-12 border p-3 fw-bold " style={{height:'60vh'}}>See your total income and spending trends in one place
-        <div className="row"><div className="col-2 text-end"><input type="date" className="form-control ml-auto col-3 text-end"></input></div></div>
+        <div className="row"></div>
             <div>
-                <Line data={data} options={option2}></Line>
+            <Line data={data} options={option2}></Line>
             </div>
         </div>)
 

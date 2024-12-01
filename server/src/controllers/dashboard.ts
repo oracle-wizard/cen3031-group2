@@ -7,18 +7,13 @@ import Month from "react-datepicker/dist/month";
 
 import * as oracledb  from 'oracledb';
 
-//interface IncomeResult{
- //   TOTAL_INCOME: number | null;
-  //  MONEY_REMAINING: number |null;
-//}
+
 export const  addBudget= async  (req: Request, res: Response) =>{
     const budget = req.body;
     console.log(budget)
 }
 export const displayBudget = async(req: Request, res: Response) =>{
-    console.log("in display budget")
     const email = req.body.email;
-    console.log(email)
     if(!email){
         res.sendStatus(400);
         return;
@@ -30,12 +25,10 @@ export const displayBudget = async(req: Request, res: Response) =>{
             EMAIL: { val: email } // Use `val` to specify the value
         };
         const result = await execute(query, binds);
-       // console.log("the result", result)
-       if(!result.rows || result.rows.length===0){
-
-         res.status(404).send("No budget data found for the current month.");
-    return;
-     }
+        if(!result.rows || result.rows.length===0){
+            res.status(404).send("No budget data found for the current month.");
+            return;
+        }
         const values = result.rows[0] as any
       //console.log("result", values[2])
         //getting total income 
@@ -53,22 +46,22 @@ export const displayBudget = async(req: Request, res: Response) =>{
 
 }
 export const getExpensesTotal = async (req: Request, res: Response)=>{
-    console.log("displaying expenses")
     const email = req.body.email;
     if(!email){
         res.sendStatus(404);
         return;
     }
     try{
-        const query = `SELECT SUM(expense_amount) FROM "C.SMELTZER".expense WHERE email =:EMAIL AND expense_date BETWEEN TRUNC(SYSDATE, 'MM' ) AND LAST_DAY(SYSDATE)`
-  
+        const query = `SELECT SUM(expense_amount) 
+                    FROM "C.SMELTZER".expense 
+                    WHERE email =:EMAIL AND expense_date 
+                    BETWEEN TRUNC(SYSDATE, 'MM' ) AND LAST_DAY(SYSDATE)`
         const result = await execute(query, {EMAIL :{ val: email }});
         if(!result.rows || result.rows.length ===0 || result.rows[0]===null){
             res.status(404).send("No expenses found for this user.");
             return;
         }
-      //  console.log("expenses", result);
-        res.status(200).json({expenses: result.rows[0]}) //sending total expenses
+        res.status(200).json({expenses: result.rows[0]}) 
 
     }
     catch(error){
@@ -77,34 +70,29 @@ export const getExpensesTotal = async (req: Request, res: Response)=>{
     }
 }
 export const  getExpensesCategories =async (req: Request, res: Response) =>{
- 
    try{
-    const email = req.body.email;
-  
-    const query = `
-        SELECT 
-        b."CATEGORY_NAME",
-        SUM(e."EXPENSE_AMOUNT")
-        FROM "C.SMELTZER"."EXPENSE" e
-        JOIN "C.SMELTZER"."BUDGETCATEGORY" b
-        ON e."CATEGORY_ID" = b."CATEGORY_ID"
-        WHERE e.email =: EMAIL
-        GROUP BY b."CATEGORY_NAME"
-        
-    `;
+        const email = req.body.email;
+        const query = `
+            SELECT 
+            b."CATEGORY_NAME",
+            SUM(e."EXPENSE_AMOUNT")
+            FROM "C.SMELTZER"."EXPENSE" e
+            JOIN "C.SMELTZER"."BUDGETCATEGORY" b
+            ON e."CATEGORY_ID" = b."CATEGORY_ID"
+            WHERE e.email =: EMAIL
+            GROUP BY b."CATEGORY_NAME"`;
 
-   const result = await execute(query, email);
-   if(!result.rows || result.rows.length===0){
-    res.sendStatus(404);
-    return;
-   }
-   console.log(result.rows[0][1],  result.rows[0][2]);
-   const data = result.rows?.map((row:any)=>({category: row[0], amount: row[1]}))
-   res.status(200).json({data})
+        const result = await execute(query, email);
+        if(!result.rows || result.rows.length===0){
+            res.sendStatus(404);
+            return;
+        }
+        const data = result.rows?.map((row:any)=>({category: row[0], amount: row[1]}))
+        res.status(200).json({data})
    }
    catch(error){
-    console.log("error in catExp:",error);
-    res.sendStatus(500);
+        console.log("error in catExp:",error);
+        res.sendStatus(500);
 
    }
 
@@ -112,7 +100,6 @@ export const  getExpensesCategories =async (req: Request, res: Response) =>{
 
 export const UsedBudgetPerCat =async (req: Request, res: Response)=>{
     try{
-     //   console.log("displaying budget categories")
         const email = req.body.email;
         const query = `
         SELECT SUM(e.expense_amount), 
@@ -121,19 +108,16 @@ export const UsedBudgetPerCat =async (req: Request, res: Response)=>{
         JOIN "C.SMELTZER"."BUDGETCATEGORY" b
         ON e."CATEGORY_ID" = b."CATEGORY_ID"
         WHERE e."EMAIL" =:email
-        GROUP BY category_name
-    `;
+        GROUP BY category_name `;
         const result = await execute(query, { email:{ val: email} });
         if(!result.rows || result.rows.length===0)
         {
-        res.sendStatus(404);
-        return;
+            res.sendStatus(404);
+            return;
         }
         const data = result.rows?.map((row:any) =>({category: row[1], amount: row[0]}))
-        //console.log(result.rows)
         res.status(200).json({data});
 
-    
     }
     catch(err){
         console.log(err)
@@ -153,8 +137,8 @@ export const dispBudgetPerCategory =async (req: Request, res: Response)=>{
         const result = await execute(query, { email:{ val: email} });
         if(!result.rows || result.rows.length===0)
         {
-        res.sendStatus(404);
-        return;
+            res.sendStatus(404);
+            return;
         }
         const data = result.rows?.map((row:any) =>({category: row[1], amount: row[0]}))
         console.log(result.rows)
@@ -176,13 +160,11 @@ export const getBudget = async (req: Request, res: Response)=>{
         const query = `
         SELECT SUM(allocated_amount)
         FROM "C.SMELTZER"."BUDGETCATEGORY" 
-        WHERE "EMAIL" =:email` 
-        ; 
+        WHERE "EMAIL" =:email` ; 
         const result = await execute(query, { email:{ val: email} });
         if(!result.rows || result.rows.length ===0){
             res.sendStatus(404);
         }
-        console.log(result.rows[0])
         const value = result.rows[0] as any
         res.status(200).json({budget: value[0]})
     

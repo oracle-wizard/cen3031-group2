@@ -20,17 +20,17 @@ export const displayBudget = async(req: Request, res: Response) =>{
     }
     try{
         //getting current month income and balance
-        const query = `SELECT * FROM "C.SMELTZER".money WHERE created_date BETWEEN TRUNC(SYSDATE, 'MM') AND LAST_DAY(SYSDATE) AND email =:EMAIL`;
+        const query = `SELECT * FROM "C.SMELTZER".money WHERE email =:EMAIL`;
         const binds = {
             EMAIL: { val: email } // Use `val` to specify the value
         };
         const result = await execute(query, binds);
         if(!result.rows || result.rows.length===0){
-            res.status(404).send("No budget data found for the current month.");
+            res.status(400).send("No budget data found for the current month.");
             return;
         }
         const values = result.rows[0] as any
-      //console.log("result", values[2])
+       console.log("displayBudget", values)
         //getting total income 
       //  const queryTotal = `SELECT total_income from "C.SMELTZER".money WHERE email =: EMAIL`
        // const result2 = await execute(queryTotal, binds);
@@ -108,6 +108,8 @@ export const UsedBudgetPerCat =async (req: Request, res: Response)=>{
         JOIN "C.SMELTZER"."BUDGETCATEGORY" b
         ON e."CATEGORY_ID" = b."CATEGORY_ID"
         WHERE e."EMAIL" =:email
+        AND expense_date 
+        BETWEEN TRUNC(SYSDATE, 'MM' ) AND LAST_DAY(SYSDATE)
         GROUP BY category_name `;
         const result = await execute(query, { email:{ val: email} });
         if(!result.rows || result.rows.length===0)
@@ -133,6 +135,7 @@ export const dispBudgetPerCategory =async (req: Request, res: Response)=>{
         SELECT allocated_amount, category_name 
         FROM "C.SMELTZER"."BUDGETCATEGORY" 
         WHERE "EMAIL" =:email
+
     `;
         const result = await execute(query, { email:{ val: email} });
         if(!result.rows || result.rows.length===0)
@@ -229,6 +232,32 @@ export const getIncomeGraph = async (req: Request, res: Response)=>{
         console.log("getExpensesGraph error:",err);
         res.sendStatus(500);
     }
+}
+export const getAvgSpending = async (req :  Request, res : Response) =>{
+    try{
+        console.log("in getAvg spending")
+        const email = req.body.email;
+        const query = `
+        SELECT AVG(allocated_amount)
+        FROM "C.SMELTZER"."BUDGETCATEGORY" 
+        WHERE "EMAIL" =:email
+        GROUP BY 
+        EXTRACT(YEAR FROM created_date), 
+        EXTRACT(MONTH FROM created_date)`;  
+        const result = await execute(query, { email:{ val: email} });
+        if(!result.rows || result.rows.length ===0){
+            res.sendStatus(404);
+        }
+        const value = result.rows[0] as any
+        console.log("avgSpending", result.rows)
+        res.status(200).json({spending: value[0]})
+    
+    }
+    catch(err){
+        console.log("budget:",err)
+        res.sendStatus(500)
+    }
+
 }
 export default {addBudget, displayBudget,getExpensesTotal, UsedBudgetPerCat, dispBudgetPerCategory, getExpensesGraph};
 

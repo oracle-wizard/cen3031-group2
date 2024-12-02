@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt, FaSave } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import api from '../axiosInstance';
@@ -65,7 +66,30 @@ const ExpenseTracker: React.FC = () => {
             console.error('Error fetching expenses:', error);
         }
     };
-
+    
+    const updateTotalSpend = async () => {
+        try {
+            console.log('Total spent being updated:');
+              console.log(api)
+            const response = await api.put('/update-total-spend');
+            console.log('Total spent updated:', response.data);
+        } catch (error: any) {
+            if (error.response) {
+                // Server responded with a status other than 2xx
+                console.error('Error response:', error.response);
+                console.error('Status:', error.response.status);
+                console.error('Data:', error.response.data);
+            } else if (error.request) {
+                // Request was made but no response was received
+                console.error('Error request:', error.request);
+            } else {
+                // Something else happened in setting up the request
+                console.error('Error message:', error.message);
+                console.error('Error object:', error); 
+            }
+        }
+    };
+    
     const formatDate = (dateString: string) => {
         const options: Intl.DateTimeFormatOptions = {
             year: 'numeric',
@@ -95,6 +119,7 @@ const ExpenseTracker: React.FC = () => {
     
         try {
             await api.post('/add-expenses', newExpense);
+            updateTotalSpend();
             fetchExpenses(); // Refresh the expenses list
             resetForm();
         } catch (error) {
@@ -130,20 +155,17 @@ const ExpenseTracker: React.FC = () => {
   
           await api.put('/update-expenses', payload);
           setEditingExpenseId(null); // Exit editing mode
+          updateTotalSpend();
           fetchExpenses(); // Refresh the table
       } catch (error) {
           console.error('Error saving expense:', error);
       }
   };
   
-  
-  
-  
-  
-
     const handleDelete = async (expenseId: number) => {
         try {
             await api.delete('/delete-expenses', { data: { expense_id: expenseId } });
+            updateTotalSpend();
             fetchExpenses(); // Refresh the expenses list
         } catch (error) {
             console.error('Error deleting expense:', error);
@@ -165,14 +187,8 @@ const ExpenseTracker: React.FC = () => {
 
     return (
         <div className="text-start">
-            <div className="tw-flex tw-justify-between tw-items-center tw-mb-4">
-                <h2 className="tw-text-green-800">Expense Tracker</h2>
-                <button
-                    onClick={() => navigate('/dashboard')}
-                    className="tw-bg-blue-500 tw-text-white tw-py-2 tw-px-4 tw-rounded tw-transition hover:tw-bg-blue-700"
-                >
-                    Back to Dashboard
-                </button>
+            <div className="tw-flex tw-justify-between tw-items-center tw-mb-4 tw-pt-8">
+                <h2 className="tw-text-green-800">Enter Expense</h2>
             </div>
 
             <form onSubmit={handleSubmit}>

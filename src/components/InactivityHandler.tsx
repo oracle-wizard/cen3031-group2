@@ -7,7 +7,7 @@ interface InactivityHandlerProps {
 
 const InactivityHandler: React.FC<InactivityHandlerProps> = ({ children }) => {
     const navigate = useNavigate();
-    const INACTIVITY_TIME = 60000; // 1 minute in milliseconds
+    const INACTIVITY_TIME = 6000000; // 1 minute in milliseconds
     let inactivityTimer: NodeJS.Timeout;
 
     // Function to handle logout

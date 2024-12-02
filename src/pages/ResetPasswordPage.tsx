@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import NavigateButton from '../components/NavigateBtn'
 
 import api from '../axiosInstance'
 
@@ -41,7 +42,7 @@ const ResetPassword: React.FC =()=>{
             headers: {
               'Content-Type': 'application/json',
             }});
-        if(reponse.status ===200){
+        if(reponse.status === 200){
             console.log("response is 200")
             setSuccess("Please check your email. ")
 
@@ -217,6 +218,7 @@ const ResetPassword: React.FC =()=>{
                 maxWidth:"300px" }}>
                 Reset password
             </button>)}
+            <NavigateButton to="/login" label="Back to Login" className='tw-mt-12 tw-col-start-5 tw-w-48' />
            
        
 

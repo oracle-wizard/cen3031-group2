@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import {register, login, logout, resetPassword, verifyCode, deleteUser, setNewPassword} from '../controllers/authController'
 import { refreshToken } from '../controllers/refreshTokenController';
-import {addBudget} from '../controllers/dashboard'
+import {addBudget, displayBudget, getExpensesTotal, getExpensesCategories,
+        getIncomeGraph, UsedBudgetPerCat, dispBudgetPerCategory, getBudget, getExpensesGraph} from '../controllers/dashboard'
 import authToken from '../middleware/authenticateToken';
-import { getExpenses, addExpense, updateExpense, deleteExpense } from '../controllers/expenseController';
+import { getExpenses, addExpense, updateExpense, deleteExpense, updateTotalSpend } from '../controllers/expenseController';
 import { getUserIncome, updateUserIncome } from '../controllers/userIncomeController';
 import {
     getBudgetCategories,
@@ -11,7 +12,7 @@ import {
     updateBudgetCategory,
     deleteBudgetCategory,
 } from '../controllers/budgetController'
-
+import { updateAccount } from '../controllers/updateAccountController';
 
 const router = Router();
 router.post('/register', register);
@@ -32,6 +33,17 @@ router.get('/get-budget-categories', authToken, getBudgetCategories);
 router.post('/add-budget-category', authToken, addBudgetCategory);
 router.put('/update-budget-category', authToken, updateBudgetCategory);
 router.delete('/delete-budget-category', authToken, deleteBudgetCategory);
+router.put('/update-total-spend', authToken, updateTotalSpend);
 router.get('/get-user-income', authToken, getUserIncome);
 router.put('/update-user-income', authToken, updateUserIncome);
+router.post('/display-budget', authToken, displayBudget)
+router.post('/get-expenses', authToken, getExpensesTotal)
+router.post('/get-expenses-categories', authToken, getExpensesCategories)
+router.post('/display-used-budget-per-category', authToken, UsedBudgetPerCat)
+router.post('/display-budget-per-category', authToken, dispBudgetPerCategory)
+router.post('/get-budget', authToken, getBudget)
+router.post('/get-expenses-graph' , authToken, getExpensesGraph)
+router.post('/get-income-graph' , authToken, getIncomeGraph)
+router.put('/update-account', authToken, updateAccount);
 export default router;
+

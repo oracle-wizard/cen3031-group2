@@ -1,6 +1,5 @@
 .user-income-container {
-    display: flex;
-    flex-direction: column;
+    padding-top: 7rem;
     align-items: center;
     justify-content: center;
     min-height: 100vh;

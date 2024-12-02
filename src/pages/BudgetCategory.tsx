@@ -124,11 +124,9 @@ const BudgetCategory: React.FC = () => {
     useEffect(() => {
         fetchCategories();
     }, []);
-
     return (
         <div className="budget-category-container">
             <div className="budget-category-content">
-                <h1 className="budget-category-title">Budget Categories</h1>
                 <ul className="category-list">
                     {categories.map((category, index) => (
                         <li key={index} className="category-item">
@@ -186,11 +184,6 @@ const BudgetCategory: React.FC = () => {
                     />
                     <button onClick={handleAddCategory} className="add-button">
                         Add Category
-                    </button>
-                </div>
-                <div className="navigation-buttons">
-                    <button onClick={() => navigate('/dashboard')} className="back-button">
-                        Back to Dashboard
                     </button>
                 </div>
             </div>

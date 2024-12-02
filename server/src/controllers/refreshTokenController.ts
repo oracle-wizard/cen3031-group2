@@ -12,6 +12,7 @@ const api = axios.create({
 // Attach the token to every request if available
 api.interceptors.request.use(
     (config) => {
+        try {
         const token = localStorage.getItem('accessToken');
         if (token) {
             console.log("Attaching access token to request.");
@@ -19,6 +20,10 @@ api.interceptors.request.use(
         } else {
             console.log("No access token found for this request.");
         }
+    }
+    catch (error) {
+        console.error("Error accessing localStorage in request interceptor:", error);
+    }
         return config;
     },
     (error) => {

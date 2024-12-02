@@ -187,14 +187,8 @@ const ExpenseTracker: React.FC = () => {
 
     return (
         <div className="text-start">
-            <div className="tw-flex tw-justify-between tw-items-center tw-mb-4">
-                <h2 className="tw-text-green-800">Expense Tracker</h2>
-                <button
-                    onClick={() => navigate('/dashboard')}
-                    className="tw-bg-blue-500 tw-text-white tw-py-2 tw-px-4 tw-rounded tw-transition hover:tw-bg-blue-700"
-                >
-                    Back to Dashboard
-                </button>
+            <div className="tw-flex tw-justify-between tw-items-center tw-mb-4 tw-pt-8">
+                <h2 className="tw-text-green-800">Enter Expense</h2>
             </div>
 
             <form onSubmit={handleSubmit}>

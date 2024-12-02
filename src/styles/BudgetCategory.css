@@ -1,13 +1,13 @@
 /* General Container */
 .budget-category-container {
-    display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     min-height: 100vh;
     background-color: #f8f9fa; /* Uniform light background color */
     font-family: 'Arial', sans-serif;
-    padding: 20px;
+    padding: 60px 20px 0 20px;
+    
 }
 
 /* Title */

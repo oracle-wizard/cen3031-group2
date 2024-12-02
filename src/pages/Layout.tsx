@@ -12,7 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="tw-h-screen">
             <AuthProvider>
             <Navbar />
-            <main className='tw-mt-48'>
+            <main className='tw-mt-20'>
             {children}
             </main>
             </AuthProvider>

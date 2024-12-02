@@ -10,7 +10,7 @@ SELECT *
 FROM all_tab_privs
 WHERE table_name = 'USERS';
 
-SELECT * FROM "C.SMELTZER".BudgetCategory where email = 'newuser@example.com';
+SELECT * FROM "C.SMELTZER".BudgetCategory where email = 'cats@gmail.com';
 SELECT * FROM "C.SMELTZER".Expense where email = 'newuser@example.com';
 SELECT * FROM "C.SMELTZER".Money where email = 'newuser@example.com';
 

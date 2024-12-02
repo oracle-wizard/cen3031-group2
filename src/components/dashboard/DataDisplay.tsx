@@ -1,7 +1,7 @@
 import  api  from "../../axiosInstance";
 import { useAuth } from '../../../server/src/context/authContext'
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import { Line, Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -87,17 +87,10 @@ const Stats : React.FC = ()=>{
     
         }
     }
-    
-
-    
-
 
     return(
         <div className="col-12 border p-3 mb-3" style={{height:'30vh'}}>
         <div className="row">
-        <div className ="col-6 text-start fw-bold">
-        {new Date(Date.now()).toLocaleString('default', { day: 'numeric',month:'long', year:"numeric"})}
-         </div>
         </div>
         <div className="font-weight-bold fw-bold fs-4"
             style={{color:"#009df7"}}>Current Balance</div>

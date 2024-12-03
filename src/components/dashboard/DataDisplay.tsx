@@ -22,26 +22,45 @@ const Stats : React.FC = ()=>{
     const [balance, setBalance] = useState("");
     const [expenses, setExpenses] = useState("");
     const [budget, setBudget] = useState("");
+    const [AvgSpending, setAvgSpending] = useState("");
 
     useEffect(()=>{
         if(email){
             displayBudget();
             displayExpenses();
             getBudget();
+            getAvgSpending();
         }
     }, [email, navigate])
 
-
+    const getAvgSpending = async () => {
+        console.log("trying to fetch budget info")
+        try{
+            const response = await api.post("/get-avg-spending", {email});
+        if(response.status===200){
+             const {spending} = response.data;
+            console.log(spending)
+            setAvgSpending(spending)
+             }
+        if(response.status===400){
+        console.log("not found")
+         }
+    }
+    catch(err){
+        console.log("error: ", err)
+     
+    }
+    }
 
     const displayBudget = async () => {
         console.log("trying to fetch budget info")
         try{
-            const response = await api.post("/display-budget", {email}, {withCredentials:true});
-        if(response.status===200){
-        const {totalIncome, balance} = response.data;
+            const response = await api.post("/display-budget", {email});
+            if(response.status===200){
+                const {totalIncome, balance} = response.data;
        // console.log(totalIncome)
-        setTotalIncome(totalIncome);
-        setBalance(balance);
+                setTotalIncome(totalIncome);
+                setBalance(balance);
              }
         if(response.status===400){
         console.log("not found")
@@ -55,9 +74,9 @@ const Stats : React.FC = ()=>{
     const displayExpenses = async()=>{
         console.log("displaying expenses")
         try{
-            const response = await api.post("/get-expenses", {email});
+            const response = await api.post("/get-total-expenses", {email});
             if(response.status===200){
-              //  console.log(response.data.expenses)
+               console.log("get total expenses", response.data.expenses)
                 setExpenses(response.data.expenses)
             }
             else{
@@ -71,9 +90,9 @@ const Stats : React.FC = ()=>{
     }
 
     const getBudget = async() =>{
-        const response = await api.post("/get-budget", {email});
-        
         try{
+            const response = await api.post("/get-budget", {email});
+
             if(response.status===200){
                 setBudget(response.data.budget);
             }
@@ -105,19 +124,7 @@ const Stats : React.FC = ()=>{
         <div className="col-4 p-1 fs-5"  style={{color:"red"}}>-${expenses}</div>
         <div className="col-4 p-1 fs-5">${budget}</div>
         </div>
-        <div  className="row">
-        
-        <div className="col-4 mt-3 fw-bold d-flex justify-content-center align-items-center">
-        Average Spending</div>
         </div>
-
-        <div  className="row">
-        <div className="col-4 p-1">$5000</div>
-        </div>
-
-
-    </div>
-   
      );
 }
 export default Stats;

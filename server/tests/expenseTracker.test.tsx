@@ -1,168 +1,172 @@
-import request from 'supertest';
-import { getExpenses, addExpense, updateExpense, deleteExpense } from '../src/controllers/expenseController';
 import { execute } from '../../server/src/database';
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
+import { updateTotalSpend, getExpenses, addExpense, updateExpense, deleteExpense } from '../src/controllers/expenseController';
 
-jest.mock('../database'); // Mock the execute function
-const mockedExecute = execute as jest.Mock;
+declare global {
+  namespace Express {
+      interface Request {
+          user?: {
+              email: string;
+          };
+      }
+  }
+}
 
-const app = express();
-app.use(express.json()); // To parse JSON requests
-app.post('/get-expenses', getExpenses);
-app.post('/add-expense', addExpense);
-app.put('/update-expense', updateExpense);
-app.delete('/delete-expense', deleteExpense);
+// Mock the `execute` function
+jest.mock('../../server/src/database', () => ({
+    execute: jest.fn(),
+}));
 
-describe('Expense Routes', () => {
-  const mockUser = { email: 'test@example.com' };
+describe('Expense Tracker API', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let jsonMock: jest.Mock;
+    let statusMock: jest.Mock;
 
-  beforeEach(() => {
-    jest.clearAllMocks(); // Clear mocks before each test
-  });
+    beforeEach(() => {
+        // Set up mocks for req and res
+        jsonMock = jest.fn();
+        statusMock = jest.fn(() => ({ json: jsonMock })) as any;
 
-  describe('GET /get-expenses', () => {
-    it('should return expenses for the logged-in user', async () => {
-      // Mock the execute function to return test data
-      mockedExecute.mockResolvedValueOnce({
-        rows: [
-          {
-            EXPENSE_ID: 1,
-            EXPENSE_TITLE: 'Groceries',
-            CATEGORY_NAME: 'Food',
-            EXPENSE_AMOUNT: 50,
-            EXPENSE_DATE: '2024-11-01',
-            DESCRIPTION: 'Weekly groceries',
-            EMAIL: 'test@example.com',
-          },
-        ],
-      });
-
-      const response = await request(app)
-        .post('/get-expenses')
-        .set('Authorization', 'Bearer fake-token') // Simulate auth (if needed)
-        .send()
-        .expect(200);
-
-      expect(mockedExecute).toHaveBeenCalledWith(
-        expect.any(String),
-        { EMAIL: mockUser.email }
-      );
-      expect(response.body).toEqual([
-        {
-          EXPENSE_ID: 1,
-          EXPENSE_TITLE: 'Groceries',
-          CATEGORY_NAME: 'Food',
-          EXPENSE_AMOUNT: 50,
-          EXPENSE_DATE: '2024-11-01',
-          DESCRIPTION: 'Weekly groceries',
-          EMAIL: 'test@example.com',
-        },
-      ]);
+        req = {
+            user: { email: 'test@example.com' },
+            body: {},
+        };
+        res = {
+            status: statusMock,
+            json: jsonMock,
+        };
+        jest.clearAllMocks(); // Clear mocks between tests
     });
 
-    it('should return a 500 error if fetching expenses fails', async () => {
-      mockedExecute.mockRejectedValueOnce(new Error('Database error'));
+    describe('updateTotalSpend', () => {
+        it('should update total spend for a user', async () => {
+            (execute as jest.Mock).mockResolvedValue({ rowsAffected: 1 });
 
-      const response = await request(app).post('/get-expenses').send().expect(500);
+            await updateTotalSpend(req as Request, res as Response);
 
-      expect(mockedExecute).toHaveBeenCalled();
-      expect(response.body).toEqual({ error: 'Failed to retrieve expenses' });
-    });
-  });
+            expect(execute).toHaveBeenCalled();
+            expect(statusMock).toHaveBeenCalledWith(200);
+            expect(jsonMock).toHaveBeenCalledWith({ message: 'TOTAL_SPENT updated successfully.' });
+        });
 
-  describe('POST /add-expense', () => {
-    it('should add a new expense and return success', async () => {
-      mockedExecute.mockResolvedValueOnce({});
+        it('should return 404 if no rows are updated', async () => {
+            (execute as jest.Mock).mockResolvedValue({ rowsAffected: 0 });
 
-      const expenseData = {
-        expense_title: 'Rent',
-        category_name: 'Housing',
-        expense_amount: 1000,
-        expense_date: '2024-11-01',
-        description: 'Monthly rent',
-      };
+            await updateTotalSpend(req as Request, res as Response);
 
-      const response = await request(app).post('/add-expense').send(expenseData).expect(200);
+            expect(statusMock).toHaveBeenCalledWith(404);
+            expect(jsonMock).toHaveBeenCalledWith({ error: 'No matching categories or expenses found for the given user.' });
+        });
 
-      expect(mockedExecute).toHaveBeenCalledWith(
-        expect.any(String),
-        {
-          EXPENSE_TITLE: 'Rent',
-          CATEGORY_NAME: 'Housing',
-          EXPENSE_AMOUNT: 1000,
-          EXPENSE_DATE: '2024-11-01',
-          DESCRIPTION: 'Monthly rent',
-          EMAIL: undefined, // Replace with mockUser.email if user email is available in middleware
-        }
-      );
-      expect(response.body).toEqual({ message: 'Expense added successfully' });
+        it('should return 500 on database error', async () => {
+            (execute as jest.Mock).mockRejectedValue(new Error('Database error'));
+
+            await updateTotalSpend(req as Request, res as Response);
+
+            expect(statusMock).toHaveBeenCalledWith(500);
+            expect(jsonMock).toHaveBeenCalledWith({ error: 'Failed to update TOTAL_SPENT.' });
+        });
     });
 
-    it('should return a 500 error if adding expense fails', async () => {
-      mockedExecute.mockRejectedValueOnce(new Error('Database error'));
+    describe('getExpenses', () => {
+        it('should fetch expenses for a user', async () => {
+            const mockRows = [
+                { EXPENSE_TITLE: 'Groceries', EXPENSE_AMOUNT: 50 },
+                { EXPENSE_TITLE: 'Utilities', EXPENSE_AMOUNT: 75 },
+            ];
+            (execute as jest.Mock).mockResolvedValue({ rows: mockRows });
 
-      const response = await request(app)
-        .post('/add-expense')
-        .send({
-          expense_title: 'Rent',
-          category_name: 'Housing',
-          expense_amount: 1000,
-          expense_date: '2024-11-01',
-        })
-        .expect(500);
+            await getExpenses(req as Request, res as Response);
 
-      expect(response.body).toEqual({ error: 'Failed to add expense' });
-    });
-  });
+            expect(execute).toHaveBeenCalled();
+            expect(statusMock).toHaveBeenCalledWith(200);
+            expect(jsonMock).toHaveBeenCalledWith(mockRows);
+        });
 
-  describe('PUT /update-expense', () => {
-    it('should update an expense and return success', async () => {
-      mockedExecute.mockResolvedValueOnce({});
+        it('should return 404 if no expenses are found', async () => {
+            (execute as jest.Mock).mockResolvedValue({ rows: null });
 
-      const expenseData = {
-        expense_id: 1,
-        expense_title: 'Groceries',
-        category_name: 'Food',
-        expense_amount: 60,
-        expense_date: '2024-11-02',
-        description: 'Weekly groceries (updated)',
-      };
+            await getExpenses(req as Request, res as Response);
 
-      const response = await request(app).put('/update-expense').send(expenseData).expect(200);
+            expect(statusMock).toHaveBeenCalledWith(404);
+            expect(jsonMock).toHaveBeenCalledWith({ error: 'No expenses found for the given user' });
+        });
 
-      expect(mockedExecute).toHaveBeenCalledWith(
-        expect.any(String),
-        {
-          EXPENSE_ID: 1,
-          EXPENSE_TITLE: 'Groceries',
-          CATEGORY_NAME: 'Food',
-          EXPENSE_AMOUNT: 60,
-          EXPENSE_DATE: '2024-11-02',
-          DESCRIPTION: 'Weekly groceries (updated)',
-        }
-      );
-      expect(response.body).toEqual({ message: 'Expense updated successfully' });
-    });
-  });
+        it('should return 500 on error', async () => {
+            (execute as jest.Mock).mockRejectedValue(new Error('Database error'));
 
-  describe('DELETE /delete-expense', () => {
-    it('should delete an expense and return success', async () => {
-      mockedExecute.mockResolvedValueOnce({});
+            await getExpenses(req as Request, res as Response);
 
-      const expenseData = { expense_id: 1 };
-
-      const response = await request(app).delete('/delete-expense').send(expenseData).expect(200);
-
-      expect(mockedExecute).toHaveBeenCalledWith(expect.any(String), { EXPENSE_ID: 1 });
-      expect(response.body).toEqual({ message: 'Expense deleted successfully' });
+            expect(statusMock).toHaveBeenCalledWith(500);
+            expect(jsonMock).toHaveBeenCalledWith({ error: 'Failed to retrieve expenses' });
+        });
     });
 
-    it('should return a 500 error if deleting an expense fails', async () => {
-      mockedExecute.mockRejectedValueOnce(new Error('Database error'));
+    describe('addExpense', () => {
+        it('should add a new expense', async () => {
+            (execute as jest.Mock)
+                .mockResolvedValueOnce({ rows: [[1]] }) // Mock category lookup
+                .mockResolvedValueOnce({}); // Mock expense insertion
 
-      const response = await request(app).delete('/delete-expense').send({ expense_id: 1 }).expect(500);
+            req.body = {
+                expense_title: 'Groceries',
+                category_name: 'Food',
+                expense_amount: 50.75,
+                expense_date: '2024-12-01',
+                description: 'Weekly shopping',
+            };
 
-      expect(response.body).toEqual({ error: 'Failed to delete expense' });
+            await addExpense(req as Request, res as Response);
+
+            expect(execute).toHaveBeenCalledTimes(2);
+            expect(statusMock).toHaveBeenCalledWith(200);
+            expect(jsonMock).toHaveBeenCalledWith({ message: 'Expense added successfully' });
+        });
+
+        it('should return 404 if category is not found', async () => {
+            (execute as jest.Mock).mockResolvedValue({ rows: [] });
+
+            req.body = {
+                category_name: 'InvalidCategory',
+            };
+
+            await addExpense(req as Request, res as Response);
+
+            expect(statusMock).toHaveBeenCalledWith(404);
+            expect(jsonMock).toHaveBeenCalledWith({ error: 'Category not found for the given user' });
+        });
+
+        it('should return 500 on error', async () => {
+            (execute as jest.Mock).mockRejectedValue(new Error('Database error'));
+
+            await addExpense(req as Request, res as Response);
+
+            expect(statusMock).toHaveBeenCalledWith(500);
+            expect(jsonMock).toHaveBeenCalledWith({ error: 'Failed to add expense' });
+        });
     });
-  });
+
+    describe('deleteExpense', () => {
+        it('should delete an expense', async () => {
+            (execute as jest.Mock).mockResolvedValue({ rowsAffected: 1 });
+
+            req.body = { expense_id: 1 };
+
+            await deleteExpense(req as Request, res as Response);
+
+            expect(execute).toHaveBeenCalled();
+            expect(statusMock).toHaveBeenCalledWith(200);
+            expect(jsonMock).toHaveBeenCalledWith({ message: 'Expense deleted successfully' });
+        });
+
+        it('should return 500 on error', async () => {
+            (execute as jest.Mock).mockRejectedValue(new Error('Database error'));
+
+            await deleteExpense(req as Request, res as Response);
+
+            expect(statusMock).toHaveBeenCalledWith(500);
+            expect(jsonMock).toHaveBeenCalledWith({ error: 'Failed to delete expense' });
+        });
+    });
 });
